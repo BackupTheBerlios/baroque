@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.5 2003/07/22 20:28:21 sorgue Exp $
+## $Id: acpi.py,v 1.6 2003/08/05 07:32:53 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -45,18 +45,18 @@ ERROR        =  0
 #exceptions
 
 class AcpiError(Exception):
-	"""Base class for APM exceptions"""
+	"""Base class for ACPI exceptions"""
 	pass
 
 
 class AcpiNoDevice(AcpiError):
-	"""Acpi is not configured on this host"""
+	"""ACPI is not configured on this host"""
 
 	def __init__(self):
 		pass
 
 	def __str__(self):
-		return "Apm is not configured on this host"
+		return "ACPI is not configured on this host"
 
 
 class AcpiNotImplemented(AcpiError):
@@ -321,11 +321,23 @@ class AcpiLinux:
 		return self.freq
 
 	def setFrequency(self,f):
+	#I think we should throw exceptions if someone goes wrong here
+	
 		if self.perf_states.has_key(f):
 			state = self.perf_states[f]
-			pr = os.listdir("/proc/acpi/processor")[0]
-			f = open("/proc/acpi/processor/"+pr+"/performance","w")		
+			try:
+				pr = os.listdir("/proc/acpi/processor")[0]
+			except OSError:
+				return ERROR
+
+			try:				
+				f = open("/proc/acpi/processor/"+pr+"/performance","w")
+			except IOError:
+				return ERROR
+				
 			f.write(state)
+			f.close()
+
 			return FREQ_CHANGED
 		else:
 			return ERROR
