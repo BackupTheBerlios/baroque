@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: bq_acpi.py,v 1.3 2002/12/08 09:40:08 riemer Exp $
+## $Id: bq_acpi.py,v 1.4 2002/12/09 00:48:06 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -32,8 +32,8 @@
 
 import bq_consts, os, stat
 
-#proc_battery_dir = "/proc/acpi/battery"
-proc_battery_dir = "/home/riemer/fix/Baroque/acpi/battery"
+proc_battery_dir = "/proc/acpi/battery"
+#proc_battery_dir = "/home/riemer/fix/Baroque/acpi/battery"
 
 class CAcpi:
 	def __init__(self):
@@ -47,15 +47,13 @@ class CAcpi:
 				self.batteries.append(i)
 		
 		self.ac_line_state = bq_consts.OFFLINE
-		self.cur_warn_level = bq_consts.WARN_LEVEL
-		self.alert_state = 0	#warn me if alert_state == 1
-
 		self.design_capacity = {}
 		self.life_capacity = {}
 
 		#initial reading of acpi info
 		self.initialize()
 		self.check_charging_state()
+
 
 	def initialize(self):
 		#read /proc/acpi/battery/*/info and extract needed infos
@@ -67,7 +65,6 @@ class CAcpi:
 				if line.find("design capacity") == 0:
 					cap = line.split(":")[1].strip()
 					self.design_capacity[i] = int(cap.split("mAh")[0].strip())
-					print self.design_capacity[i], "mAh"
 					break
 					
 				line = info_file.readline()
@@ -84,7 +81,6 @@ class CAcpi:
 				if line.find("remaining capacity") == 0:
 					cap = line.split(":")[1].strip()
 					self.life_capacity[i] = int(cap.split("mAh")[0].strip())
-					print self.life_capacity[i] , "mAh"
 					
 				if line.find("charging state") == 0:
 					state = line.split(":")[1].strip()

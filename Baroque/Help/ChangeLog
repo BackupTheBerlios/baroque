@@ -1,5 +1,9 @@
 changes from 0.1.0 to 0.2.0:
 
+2002-12-08 Tilo Riemer <riemer@lincvs.org>
+
+	* Linux: support for ACPI added 
+
 2002-11-19 Tilo Riemer <riemer@lincvs.org>
 
 	* FreeBSD: support for more than one battery added 

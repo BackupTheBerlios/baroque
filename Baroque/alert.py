@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+
 ##############################################################################
 ##
-## $Id: bq_consts.py,v 1.2 2002/12/09 00:49:28 riemer Exp $
+## $Id: alert.py,v 1.1 2002/12/09 00:51:06 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
-## All rights reserved.
+## All rights reserved. 
 ##
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions
@@ -15,9 +17,9 @@
 ##    notice, this list of conditions and the following disclaimer in the
 ##    documentation and/or other materials provided with the distribution.
 ## 3. The name of the author may not be used to endorse or promote products
-##    derived from this software without specific prior written permission.
+##    derived from this software without specific prior written permission. 
 ##
-## THIS SOFTWARE IS PROVIDED BY THE AUTHOR `AS IS'' AND ANY EXPRESS OR
+## THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 ## IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 ## OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 ## IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
@@ -30,11 +32,12 @@
 ##
 ###############################################################################
 
-OFFLINE  = 0
-ONLINE   = 1
-CHARGING = 2      #implies ONLINE
 
-#opens a message box if percentage battery capacity is less than WARN_LEVEL
-WARN_LEVEL = 20   #warn if battery capacity is less or equal than WARN_LEVEL
+import findrox
+import rox
+import sys
 
- 
+
+
+msg = 'The capacity of battery is less than ' + sys.argv[1] + "%"
+rox.alert(msg)
