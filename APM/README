@@ -1,0 +1,33 @@
+Introduction
+============
+
+The goal of apm.py is providing of an uniform and platform
+independent interface to APM. At the moment it implements only
+battery relevant functions. The interface is not stable yet.
+
+Because I don't have dozens of laptops and operating systems
+I need help! It would be great to have a Python modul which
+covers APM more or less completely for many platforms one day.
+
+
+Usage of apm.py
+===============
+
+Usage is simple. Do something like the following:
+
+import apm
+battery = apm.Apm()
+
+...
+
+battery.update()
+print battery.percent()
+print battery.time()
+print battery.charging_state()
+
+
+
+Note that you have to call update() if you want get the current
+state of battery. Note furthermore that apm raises exceptions in 
+some cases. Please take a look into the short and well readable
+source file apm.py.

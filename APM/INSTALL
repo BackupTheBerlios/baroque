@@ -1,0 +1,24 @@
+INSTALL
+=======
+
+
+Linux 2.4:
+
+The Linux implementation reads informations from /proc/apm.
+Therefore a low level modul is not needed. Copy the file
+apm.py from the apm.py directory into your Python 
+directory/site-packages (in most cases you must be root for 
+that). That's all.
+
+
+NetBSD 1.6/ FreeBSD 4 (FreeBSD coming soon):
+
+You need two modules: apm.py and apm_lowlevel.py. In most cases 
+you must be root for the next steps. 
+Installation of apm.py is very simple. Copy the file apm.py from 
+the apm.py directory into your Python directory/site-packages. 
+For installation of apm_lowlevel.py do the following:
+
+python setup.py install
+
+That's all.
