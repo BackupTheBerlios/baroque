@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.18 2003/08/19 18:27:14 riemer Exp $
+## $Id: AppletRun,v 1.19 2003/09/08 19:57:52 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -42,7 +42,7 @@ import time, string, os
 
 
 #intervall which is used for updating apm info... (milliseconds)
-CHECK_INTERVALL = 20000
+CHECK_INTERVALL = 10000
 
 #opens a message box if percentage battery capacity is less than WARN_LEVEL
 WARN_LEVEL = 20   #warn if battery capacity is less or equal than WARN_LEVEL

@@ -1,9 +1,14 @@
 changes from 0.4.0 to 0.4.1:
 
+2003-09-08 Tilo Riemer <riemer@lincvs.org>
+
+	* changed: default check intervall is now 10 seconds
+	(instead of 20 seconds)
+
 2003-08-19 Tilo Riemer <riemer@lincvs.org>
 
 	* changed: catch exception from acpi.py (configuration 
-	changed)
+	changed exception)
 
 	
 changes from 0.3.1 to 0.4.0:
