@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.10 2003/08/15 07:46:45 riemer Exp $
+## $Id: acpi.py,v 1.11 2003/08/15 14:16:36 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -256,7 +256,7 @@ class AcpiLinux:
 						self.present_rate[i] = pr_rate
 
 					line = state_file.readline()
-			state_file.close()
+					state_file.close()
 		except IOError:
 			raise AcpiError, ERR_CONFIGURATION_CHANGED
 
@@ -365,6 +365,10 @@ class AcpiLinux:
 
 	def percent(self):
 		"""Returns percentage capacity of all batteries"""
+
+		if self.nb_of_batteries() == 0:
+			return 0
+
 		life_capacity = 0
 		design_capacity = 0
 		for i,c in self.life_capacity.items():
