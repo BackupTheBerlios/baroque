@@ -1,3 +1,8 @@
+ 2004-07-10 rds <rds@rdsarts.com>
+
+	* Committed: Splitted power.py and Baroque into
+		seperate packages.
+
 changes from 0.5.1 to 0.6.0:
 
 2004-04-26

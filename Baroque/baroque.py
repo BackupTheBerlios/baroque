@@ -1,6 +1,6 @@
 ############################################################################
 ##
-## $Id: baroque.py,v 1.13 2004/01/08 04:26:11 rds Exp $
+## $Id: baroque.py,v 1.14 2004/07/11 02:22:05 rdsarts Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -34,11 +34,23 @@
 ###############################################################################
 
 
-import rox
+import rox, os, pango
 from rox import g
 from rox.options import Option
-import pango
 
+import findpower
+findpower.find()
+import power
+from power import *
+offline_state = OFFLINE
+
+battery = Power()
+	#rox.croak('Sorry, but we could not find or load apm.py or acpi.py. '\
+	#	  'Please download and install power.py from http://rdsarts.com/code/powerpy/')
+
+_ = rox.i18n.translation(os.path.join(rox.app_dir, 'Messages'))
+
+'''
 batt_type = -1	# 0 = ACPI, 1 = APM
 
 # Initalize the battery object
@@ -56,7 +68,10 @@ except ImportError:
 	except ImportError:
 		# No PM module loaded. We be screwed.
 		# warning_dialog(title='Low Battery Warning', txt="Sorry, could not load apm.py or acpi.py.\nPlease download and install one from http://www.iapp.de/~riemer/projects", warn = 0)
-		rox.croak('Sorry, but we could not find or load apm.py or acpi.py. Please download and install either apm.py or acpi.py from http://www.iapp.de/~riemer/projects')
+		rox.croak('Sorry, but we could not load power.py. '+
+			  'Please download and install either apm.py or acpi.py from http://www.iapp.de/~riemer/projects')
+
+'''
 
 def warning_dialog(txt='', warning = 1, title='Dialog'):
 	"""This displays a dialog box, with only a OK button, that contains txt as it's text, and title as it's title.
@@ -84,6 +99,7 @@ def warning_dialog(txt='', warning = 1, title='Dialog'):
 
 class boxes(g.VBox):
 	"""This is a class containing the V/HBoxes for our applet."""
+	## XXX: Move this back into being class variables, not instance.
 	# Meet the Opteels.
 	warn = Option('warn', True)
 	warn_level = Option('warn_level', 10)
@@ -134,18 +150,11 @@ class boxes(g.VBox):
 
 	def update_display(self, battery):
 		"""Updates all the parts of our applet, and cleans it up if needed."""
-
-		if batt_type == 0:
-			try:
-				battery.update()
-			except AcpiError:
-				# rem battery
-				# battery = acpi.Acpi()
-				#TODO: handling of exception
-				pass
-		else:
+		try:
 			battery.update()
-
+		except:
+			print "SHOULD HANDLE THIS! ERROR IN UPDATE!!!!!!"
+			return g.TRUE
 
 		percent=battery.percent()
 		self.percent_display.set_fraction(float(percent) / 100)
@@ -154,60 +163,27 @@ class boxes(g.VBox):
 		txt = "Unknown"
 
 		if battery.charging_state() == 1:
-			txt = 'AC Online'
+			txt = _("AC Online")
 		elif battery.charging_state() == 2:
-			txt = 'Charging'
+			txt = _("Charging")
 		else:
 			# Discharing from the battery
 			# TODO: This reports 'Battery' if we start it without a battery. This is a no-no?
 			if self.msg == 1:
 				self.msg = 0
-				txt = 'Battery'
+				txt = _("Battery")
 			else:
 				self.msg =1
-				if batt_type == 1:
-					temp2 = battery.time()
-					temp = int(temp2 / 60)
-					temp2 = temp2 - (temp * 60)
-					txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
-				else:
-					# try:
-						temp = float(battery.estimated_lifetime())
-						temp2 = int(60 * (temp - int(temp)))
-						txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
-					# except ValueError:
-					#	txt = 'Charging'
-
-#		if (self.LABEL_IN_BAR.value) == 'True':
-#			self.percent_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value)
-#			self.percent_display.set_text(txt)
-#			self.percent_display.show()
-#			self.battery_display.hide()
-#		else:
-#			self.percent_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value - (self.text_height.int_value + 4))
-#			self.battery_display.set_size_request(self.applet_width.int_value, self.text_height.int_value + 4)
-#			self.battery_display.set_markup('<span foreground="black" size="'+ str(self.text_height.int_value) + '000">' + txt + ' </span>')
-#			self.percent_display.set_text('')
-#			self.percent_display.show()
-#			self.battery_display.show()
+				hour, min = battery.time()
+				txt = _("%d hours, %d minutes")%(hour, min)
 
 		self.percent_display.set_text(txt)
-		# print 'TODO: Fix this! Should be handled by editing the pango stuffs, or maybe editing the style?'
-		# print '<span font_desc="'+ str(self.text_font.value) + '">' + txt + ' </span>'
-		# self.battery_display.set_markup('<span font_desc="'+ str(self.text_font.value) + '">' + txt + ' </span>')
-		# Note to self: If I ever have to mess with fonts again, NEVER DO IT WITHOUT PANGO. ;)
-		# 	Gads, it was so much easier...
 		
 		label_font = pango.FontDescription(self.text_font.value)
 		self.battery_display.modify_font(label_font)
 		self.battery_display.set_markup(txt)
 
 		label_display = self.LABEL_IN_BAR.value
-
-		# This is just here because it's easier to read this then the commented out stuff above. ;)
-		#
-		# self.battery_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value)
-		# self.percent_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value)
 
 		if label_display == 'text-only':
 			self.percent_display.hide()
@@ -227,13 +203,13 @@ class boxes(g.VBox):
 		if self.warn.value == 'True':
 			if (battery.charging_state() == offline_state and percent <= self.warn_level.int_value):
 				if self.warned == False:
-					warning_dialog(title='Warning, low battery', 
-						txt='Warning. Battery is\ncurrently at ' + str(battery.percent()) + '%')
+					warning_dialog(title=_('Warning, low battery'), 
+						txt=_('Warning. Battery is\ncurrently at %d%%'%battery.percent()) )
 					self.warned = True
 			else:
 				self.warned = False
 
-		return 1
+		return g.TRUE
 
 	def percent(self):
 		return str(battery.percent())
