@@ -1,3 +1,6 @@
-0.1.0 to 0.2.0
+changes from 0.1.0 to 0.2.0:
 
-support for MAC OS X added (thanks to Alessandro Gatti)
+2003-03-25 Tilo Riemer <riemer@lincvs.org>
+
+	* added: support for MAC OS X
+	Many thanks to Alessandro Gatti for the patch.
