@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: alert.py,v 1.2 2002/12/09 22:43:54 riemer Exp $
+## $Id: alert.py,v 1.3 2002/12/10 08:39:40 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -40,4 +40,4 @@ import sys
 
 
 msg = 'The capacity of battery is down to only ' + sys.argv[1] + "%!"
-rox.alert(msg)
+rox.info(msg)
