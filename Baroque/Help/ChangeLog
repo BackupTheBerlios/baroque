@@ -1,4 +1,4 @@
-changes from merge of BatMonitor and Baroque to 0.5.0:
+changes from 0.5.0 to 0.5.1:
 
 2003-12-10 Rds <rds@rdsarts.com>
 
@@ -7,6 +7,9 @@ changes from merge of BatMonitor and Baroque to 0.5.0:
 	* cleaned up some logic
 	* option change: time-till-update now works off
 		tenths of a second instead of milliseconds
+
+
+changes from merge of BatMonitor and Baroque to 0.5.0:
 
 2003-12-06 Tilo Riemer <riemer@lincvs.org>
 
