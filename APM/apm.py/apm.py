@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: apm.py,v 1.2 2003/04/10 22:13:55 riemer Exp $
+## $Id: apm.py,v 1.3 2003/08/18 09:08:36 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -96,6 +96,11 @@ class Apm:
 			self.apm = ApmGeneric()  #we use apm_lowlevel
 		
 		elif res.find("linux2") > -1:
+			self.apm = ApmLinux()
+
+		elif res.find("linux") > -1:
+			#some systems return linux instead of linux2. We should
+			#show a warning or check the system by ourselves for Linux2
 			self.apm = ApmLinux()
 
 		elif res.find("darwin") > -1:

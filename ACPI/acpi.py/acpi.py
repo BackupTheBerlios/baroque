@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.11 2003/08/15 14:16:36 riemer Exp $
+## $Id: acpi.py,v 1.12 2003/08/18 09:08:57 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -95,6 +95,11 @@ class Acpi:
 			raise AcpiError, ERR_NOT_IMPLEMENTED
 		
 		elif res.find("linux2") > -1:
+			self.acpi = AcpiLinux()
+			
+		elif res.find("linux") > -1:
+			#some systems return linux instead of linux2. We should
+			#show a warning or check by ourselves for Linux2
 			self.acpi = AcpiLinux()
 			
 		else:
