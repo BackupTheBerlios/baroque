@@ -34,17 +34,30 @@
 						</numentry>
 						<label> Wide</label>
 					</hbox>
+					<spacer/>
+	    				<numentry name="text_height" label="Font size" min='1' max='100' step='1'>
+	    					This is the font size at which the text will be display if not in the battery meter. If it's in the meter, it will be displayed at your default GTK+ 2 text width.
+	    				</numentry>
 				</vbox>
 			</frame>
 				<spacer/>
 				<vbox>
-				    	<toggle name="LABEL_IN_BAR" label="Display text in meter?">
-				    		If you do, it will no longer have a running display of battery info under the meter, but will rather place it inside. This saves vertical space, so if you run a horizontal panel and want to save space, this is the time to do it.
-	    				</toggle>
-    					<spacer/>
-	    				<numentry name="text_height" label="Font size" min='1' max='100' step='1'>
-	    					This is the font size at which the text will be display if not in the battery meter. If it's in the meter, it will be displayed at your default GTK+ 2 text width.
-	    				</numentry>
+					<frame label='Show battery information as:'>
+					<radio-group name='LABEL_IN_BAR' >
+						<radio value='text-only' label='Text only'>
+							Only display the text. No progress bar, no graphics, no fun. ;)
+						</radio>
+						<radio value='progress-under' label='Under progress bar'>
+							Displays the text under the progress bar.
+						</radio>
+						<radio value='progress-only' label='Progress bar with text'>
+							displays a progress bar, with any text being wrote inside the progress bar.
+						</radio>
+						<radio value='progress-notext' label='Progress bar only'>
+							Displays the progress bar only, with no text.
+						</radio>
+					</radio-group>
+					</frame>
 				</vbox>
 			</hbox>
 		</frame>

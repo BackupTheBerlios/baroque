@@ -1,6 +1,6 @@
 ############################################################################
 ##
-## $Id: baroque.py,v 1.8 2003/12/14 15:25:46 riemer Exp $
+## $Id: baroque.py,v 1.9 2004/01/03 18:08:16 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -111,6 +111,7 @@ class boxes(g.VBox):
 			g.timeout_remove(self.update_timeout)
 			self.update_display(battery)
 			# print str(int(self.ticks_till_update.int_value) * 100)
+			self.set_size_request(self.applet_width.int_value, -1)
 			self.update_timeout = g.timeout_add(int(self.ticks_till_update.int_value) * 100, self.update_display, battery)
 
 		rox.app_options.add_notify(options_update)
@@ -122,6 +123,7 @@ class boxes(g.VBox):
 		self.connect('destroy', destroyed)
 		self.pack_start(self.percent_display, 1, 1, 2)
 		self.pack_start(self.battery_display, 1, 1, 2)
+		self.set_size_request(self.applet_width.int_value, -1)
 		self.update_display(battery)
 		self.battery_display.set_justify(g.JUSTIFY_CENTER)
 		self.show()
@@ -146,29 +148,6 @@ class boxes(g.VBox):
 
 		#should never happens
 		txt = "Unknown"
-		
-#		if self.msg == 1:
-#			if battery.charging_state() == 1:
-#				txt = 'AC Online'
-#			elif battery.charging_state() == 2:
-#				txt = 'Charging'
-#			else: txt = 'Battery'
-#			self.msg = 0
-#		else:
-#			if batt_type == 1:
-#				temp2 = battery.time()
-#				temp = int(temp2 / 60)
-#				temp2 = temp2 - (temp * 60)
-#				txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
-#			else:
-#				try:
-#					temp = float(battery.estimated_lifetime())
-#					temp2 = int(60 * (temp - int(temp)))
-#					txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
-#				except ValueError:
-#					txt = 'AC Online'
-#			if battery.charging_state() == 2: txt = 'Charging'
-#			self.msg = 1
 
 		if battery.charging_state() == 1:
 			txt = 'AC Online'
@@ -194,29 +173,51 @@ class boxes(g.VBox):
 					except ValueError:
 						txt = 'Charging'
 
-		if (self.LABEL_IN_BAR.value) == "True":
-			self.percent_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value)
-			self.percent_display.set_text(txt)
+#		if (self.LABEL_IN_BAR.value) == 'True':
+#			self.percent_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value)
+#			self.percent_display.set_text(txt)
+#			self.percent_display.show()
+#			self.battery_display.hide()
+#		else:
+#			self.percent_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value - (self.text_height.int_value + 4))
+#			self.battery_display.set_size_request(self.applet_width.int_value, self.text_height.int_value + 4)
+#			self.battery_display.set_markup('<span foreground="black" size="'+ str(self.text_height.int_value) + '000">' + txt + ' </span>')
+#			self.percent_display.set_text('')
+#			self.percent_display.show()
+#			self.battery_display.show()
+
+		self.percent_display.set_text(txt)
+		print 'TODO: Fix this! Should be handled by editing the pango stuffs, or maybe editing the style?'
+		self.battery_display.set_markup('<span foreground="black" size="'+ 
+			str(self.text_height.int_value) + '000">' + txt + ' </span>')
+
+		label_display = self.LABEL_IN_BAR.value
+
+		# This is just here because it's easier to read this then the commented out stuff above. ;)
+		#
+		# self.battery_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value)
+		# self.percent_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value)
+
+		if label_display == 'text-only':
+			self.percent_display.hide()
+			self.battery_display.show()
+		elif label_display == 'progress-only':
 			self.percent_display.show()
 			self.battery_display.hide()
+		elif label_display == 'progress-notext':
+			self.percent_display.show()
+			self.battery_display.hide()
+			self.percent_display.set_text('')
 		else:
-			self.percent_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value - (self.text_height.int_value + 4))
-			self.battery_display.set_size_request(self.applet_width.int_value, self.text_height.int_value + 4)
-			self.battery_display.set_markup('<span foreground="black" size="'+ str(self.text_height.int_value) + '000">' + txt + ' </span>')		
 			self.percent_display.set_text('')
 			self.percent_display.show()
 			self.battery_display.show()
 
-		# if battery.charging_state() == offline_state: 
-		#	if self.warned == False:
-		#		if self.warn.value == 'True':
-		#			if percent <= self.warn_level.int_value:
 		if self.warn.value == 'True':
 			if (battery.charging_state() == offline_state and percent <= self.warn_level.int_value):
 				if self.warned == False:
-#				if battery.charging_state() == offline_state: 
-#					if percent <= self.warn_level.int_value:
-					warning_dialog(title='Warning, low battery', txt='Warning. Battery is\ncurrently at ' + str(battery.percent()) + '%')
+					warning_dialog(title='Warning, low battery', 
+						txt='Warning. Battery is\ncurrently at ' + str(battery.percent()) + '%')
 					self.warned = True
 			else:
 				self.warned = False

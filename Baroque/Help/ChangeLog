@@ -1,5 +1,12 @@
 changes from 0.5.1 to 0.6.0:
 
+2003-12-16 Rds <rds@rdsarts.com>
+
+	* Added: Options for displaying text/bar. Now, instead of
+		one hard to figure out line, it's 4. ;)
+	* BROKE: font handling of text. This is broke until I get
+		the new style code in. =\
+
 2003-12-15 Rds <rds@rdsarts.com>
 
 	* fixed: Changed labels in Options.xml to reflect

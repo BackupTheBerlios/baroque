@@ -1,10 +1,9 @@
-The applet should read the current panel size and adjust itself to it automatically.
-MASSIVE code cleanup. Make everything objects.
-	... No, no, trust me, it'll be cool.
+Depricate option 'Applet height' by using proper font-size changes.
+
+See about adding code to ROX-Lib2 to let us inherit the panel's menu, and show the baroque menu as a sub-menu of that.
 Add credits dialog ;)
-Clean up the menu. Should have a "root' header for appname, and option. See if we can possibly grab the panel's menu as well.
 Clean up the apm/acpi stuffs. This should NOT be getting taken care of in the boxes class, but rather in some wrapper for the battery API loading.
-Clean up init in AppletRun.
+Clean up init in AppletRun. ;)
 
 Minor fixes needed:
 Massive pruning in options. ;)
