@@ -1,6 +1,6 @@
 /****************************************************************************
 
- $Id: apm_lowlevel.c,v 1.1 2003/04/07 21:01:25 riemer Exp $
+ $Id: apm_lowlevel.c,v 1.2 2003/04/30 20:31:30 riemer Exp $
 
  Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
  All rights reserved. 
@@ -57,7 +57,7 @@ static PyObject* wrap_apm_state(PyObject* self, PyObject* args)
 /* get version of this module */
 static PyObject* wrap_version(PyObject* self, PyObject* args)
 {
-  char version[] = "0.1";
+  char version[] = "0.3";
   return Py_BuildValue("s", version);
 }
 

@@ -1,3 +1,11 @@
+changes from 0.2.0 to 0.3.0:
+
+2003-04-30 Tilo Riemer <riemer@lincvs.org>
+
+	* added: support for FreeBSD 4 and OpenBSD
+	* fixed: NetBSD: charging state
+	
+	
 changes from 0.1.0 to 0.2.0:
 
 2003-03-25 Tilo Riemer <riemer@lincvs.org>

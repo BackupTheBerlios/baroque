@@ -1,6 +1,6 @@
 /****************************************************************************
 
- $Id: apm_lowlevel_funcs.c,v 1.2 2003/04/10 22:17:29 riemer Exp $
+ $Id: apm_lowlevel_funcs.c,v 1.3 2003/04/30 20:33:02 riemer Exp $
 
  Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
  All rights reserved. 
@@ -34,8 +34,8 @@
 enum {
   BATTERY_AC_OFF,      /* The computer is running off the battery. */
   BATTERY_AC_ON,       /* Fully charged battery and computer running
-                          off AC power. */
-  BATTERY_CHARGING,    /* The computer is running off AC power but the
+                          on AC power. */
+  BATTERY_CHARGING,    /* The computer is running on AC power but the
                           battery isn't fully charged yet. */
   BATTERY_NO_BATTERY   /* This is a desktop system or there is not a
                           battery in the computer battery bay. */
@@ -45,20 +45,64 @@ enum {
                                        simply does not matter. */
 
 #ifdef __FreeBSD__
-not implemented yet, but coming soon
+
+#include <sys/file.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <machine/apm_bios.h>
+
+const char APM_DEV[] = "/dev/apm";
+
+int apm_state(int* p, int* t, int* ac) //return value == error code
+{
+  //t  --> remaining time
+  //p  --> remaining percentage
+  //ac --> ac state (on|offline|charging)
+
+  struct apm_info battery;
+  int fd;
+
+
+  *t  = 0;
+  *p  = 0;
+  *ac = 0;
+  
+  fd = open(APM_DEV, O_RDONLY);
+  if (fd == -1) return -1;
+
+  memset(&battery, 0, sizeof(battery));
+  if (ioctl(fd, APMIO_GETINFO,
+	    &battery) == -1) {
+    return -1;
+  }
+
+  *p = battery.ai_batt_life;
+  *t = battery.ai_batt_time / 60;  /* ai_batt_time in seconds */
+
+  /* ac: 0 --> offline; 1 --> online; 2 --> charging */
+  if (battery.ai_acline > 0) *ac = 1;
+  else *ac = 0;
+
+  if (battery.ai_batt_stat == 3) *ac = 2;
+
+  return 0;
+}
+
 #endif
 
 /***************************************************************************/
 
-#ifdef __NetBSD__
+#ifdef __OpenBSD__
 
-#define PATH_APM_DEV "/dev/apm"
-
-#include <fcntl.h>
-#include <sys/types.h>
+#include <sys/file.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <sys/param.h>
 #include <machine/apmvar.h>
 
+const char APM_DEV[] = "/dev/apm";
 
 int apm_state(int* p, int* t, int* ac) //return value == error code
 {
@@ -74,7 +118,7 @@ int apm_state(int* p, int* t, int* ac) //return value == error code
   *p  = 0;
   *ac = 0;
   
-  fd = open(PATH_APM_DEV, O_RDONLY);
+  fd = open(APM_DEV, O_RDONLY);
   if (fd == -1) return -1;
 
   memset(&battery, 0, sizeof(battery));
@@ -90,7 +134,56 @@ int apm_state(int* p, int* t, int* ac) //return value == error code
   if (battery.ac_state == APM_AC_ON) *ac = 1;
   else *ac = 0;
 
-  if (battery.battery_state == APM_BATT_CHARGING) *ac = 2;
+  if (battery.battery_state & APM_BATT_CHARGING) *ac = 2;
+
+
+  return 0;
+}
+
+#endif
+
+/***************************************************************************/
+
+#ifdef __NetBSD__
+
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <machine/apmvar.h>
+
+const char APM_DEV[] = "/dev/apm";
+
+int apm_state(int* p, int* t, int* ac) //return value == error code
+{
+  //t  --> remaining time
+  //p  --> remaining percentage
+  //ac --> ac state (on|offline|charging)
+
+  struct apm_power_info battery;
+  int fd;
+
+
+  *t  = 0;
+  *p  = 0;
+  *ac = 0;
+  
+  fd = open(APM_DEV, O_RDONLY);
+  if (fd == -1) return -1;
+
+  memset(&battery, 0, sizeof(battery));
+  if (ioctl(fd, APM_IOC_GETPOWER,
+	    &battery) == -1) {
+    return -1;
+  }
+
+  *p = battery.battery_life;
+  *t = battery.minutes_left;
+
+  /* ac: 0 --> offline; 1 --> online; 2 --> charging */
+  if (battery.ac_state == APM_AC_ON) *ac = 1;
+  else *ac = 0;
+
+  if (battery.battery_state & APM_BATT_CHARGING) *ac = 2;
 
 
   return 0;
