@@ -1,3 +1,12 @@
+changes from 0.3.1 to 0.4.0:
+
+2003-05-29 Tilo Riemer <riemer@lincvs.org>
+
+	* changed: Baroque uses now acpi.py and apm.py.
+	In this way Baroque runs on all platforms which 
+	are supported by apm.py or acpi.py.
+
+
 changes from 0.3.0 to 0.3.1:
 
 2002-12-15 Tilo Riemer <riemer@lincvs.org>

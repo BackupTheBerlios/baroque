@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.15 2003/03/31 01:14:05 riemer Exp $
+## $Id: AppletRun,v 1.16 2003/06/02 05:21:13 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -41,34 +41,55 @@ from rox import applet
 import time, string, os
 
 
-#intervall which is used for calling apm... (milliseconds)
-CHECK_INTERVALL = 10000
+#intervall which is used for updating apm info... (milliseconds)
+CHECK_INTERVALL = 20000
 
+#opens a message box if percentage battery capacity is less than WARN_LEVEL
+WARN_LEVEL = 20   #warn if battery capacity is less or equal than WARN_LEVEL
+
+#use ACPI or APM
+TYPE_ACPI = 0
+TYPE_APM  = 1
+
+
+type = TYPE_ACPI
 
 cur_warn_level = 0
 cur_default_warn_level = 0
 app_dir = ""
 
 
+#init display
+battery_display = g.Label("")
+battery_display.set_justify(g.JUSTIFY_RIGHT)
+
+
+
 def update_display(battery):
 	global cur_warn_level
 	global cur_default_warn_level
 	global app_dir
+	global type
+	global battery_display
 	
 	battery.update()
 
 	percent = battery.percent()
-	percent_str = str(percent) + "%\n"
+	percent_str = str(percent) + "%"
 
-	hours = battery.time() / 60
-	mins  = battery.time() % 60
-	
-	time_str = str(hours) + ":" + str(mins)
+	if type == TYPE_ACPI:
+		cap_time_str = str(battery.capacity()) + " mAh"
+		offline_state = acpi.OFFLINE 
+	else:
+		hours = battery.time() / 60
+		mins  = battery.time() % 60
+		cap_time_str = str(hours) + ":" + str(mins)
+		offline_state = apm.OFFLINE 
 
-	txt = percent_str + time_str
-	apm_display.set_text(txt)
+	txt = percent_str + "\n" + cap_time_str
+	battery_display.set_text(txt)
 
-	if battery.charging_state() == bq_consts.OFFLINE:
+	if battery.charging_state() == offline_state:
 		if percent <= cur_warn_level:
 			cur_warn_level = percent
 			os.system(app_dir + "/alert.py " + str(cur_warn_level) + "&")
@@ -86,33 +107,37 @@ else:
 	main = rox.Window()
 
 
-#init display
-apm_display = g.Label("")
-apm_display.set_justify(g.JUSTIFY_RIGHT)
-
-
 #hack?
 app_dir = sys.argv[0].split("AppletRun")[0]
 
-#add consts path
-sys.path.append(app_dir + "/Modules")
+
+try:
+	import acpi
+	battery = acpi.Acpi()
+	type = TYPE_ACPI
+except ImportError:
+	#no ACPI module found -> try APM
+	try:
+		import apm
+		battery = apm.Apm()
+		type = TYPE_APM
+	except ImportError:
+		#no APM module found -> exit
+		error_msg = "Neither APCI nor APM module found.\n"
+		error_msg = error_msg + "Install one of these modules (see http://www.iapp.de/~riemer/projects/apm.py)"
+		sys.exit(error_msg)
+		
 
 
-import bq_consts, apm
-
-
-cur_warn_level = bq_consts.WARN_LEVEL
-cur_default_warn_level = bq_consts.WARN_LEVEL
-
-battery = apm.CApm()
+cur_warn_level = WARN_LEVEL
+cur_default_warn_level = WARN_LEVEL
 
 
 update_display(battery)
 
-
 	
 main.set_border_width(6)
-main.add(apm_display)
+main.add(battery_display)
 main.show_all()
 
 g.timeout_add(CHECK_INTERVALL, update_display, battery)
