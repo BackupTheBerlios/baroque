@@ -11,7 +11,7 @@ directory/site-packages (in most cases you must be root for
 that). That's all.
 
 
-NetBSD 1.6/ FreeBSD 4 (FreeBSD coming soon):
+NetBSD 1.6 / FreeBSD 4 / Mac OS X:
 
 You need two modules: apm.py and apm_lowlevel.py. In most cases 
 you must be root for the next steps. 
