@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.4 2003/07/01 23:43:54 sorgue Exp $
+## $Id: acpi.py,v 1.5 2003/07/22 20:28:21 sorgue Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -30,17 +30,17 @@
 ##
 ###############################################################################
 
-
 import os,stat,sys
 
 
 #enums
-OFFLINE     =  0
-ONLINE      =  1
-CHARGING    =  2   #implies ONLINE
-OFF         =  0
-ON          =  1
-
+OFFLINE      =  0
+ONLINE       =  1
+CHARGING     =  2   #implies ONLINE
+FAN_OFF      =  0
+FAN_ON       =  1
+FREQ_CHANGED =  1
+ERROR        =  0
 
 #exceptions
 
@@ -136,6 +136,18 @@ class Acpi:
 		"""Returns fan states"""
 		return self.acpi.fan_state()
 
+	def frequency(self):
+		""" Return  the frequency of the processor"""
+		return self.acpi.frequency()
+
+	def performance_states(self):
+		""" Return a list of available frequencies for the proc """
+		return self.acpi.performance_states()
+
+	def setFrequency(self,f):
+		""" Set the processor frequency - Warning ! Needs root privileges to work """
+		return self.acpi.setFrequency(f)
+
 
 class AcpiLinux:
 	def __init__(self):
@@ -171,7 +183,7 @@ class AcpiLinux:
 			line = info_file.readline()
 			
 			while len(line) != 0:
-				if line.find("design capacity:") == 0:
+				if line.find("last full capacity:") == 0:
 					cap = line.split(":")[1].strip()
 					self.design_capacity[i] = int(cap.split("mWh")[0].strip())					
 				line = info_file.readline()
@@ -180,6 +192,19 @@ class AcpiLinux:
 
 		for i in os.listdir("/proc/acpi/fan"):
 			self.fans[i] = "off"
+
+		# Read processor info
+			self.processor = os.listdir("/proc/acpi/processor")[0]
+			self.perf_states = {}
+			f = open("/proc/acpi/processor/"+self.processor+"/performance")
+			l = f.readline()
+			while(len(l)!=0):
+				if l.find("MHz") > -1:
+					state = l.split(":")[0].strip().split("P")[-1]
+					freq = l.split(":")[1].split(",")[0].strip()
+					self.perf_states[freq] = state
+				l = f.readline()
+
 
 	def update(self):
 		"""Read /proc/acpi/battery/*/state and extract needed infos"""
@@ -231,8 +256,23 @@ class AcpiLinux:
 			line = file.readline()
                         while len(line) != 0:
                                 if line.find("status") == 0:
-                                        self.fans[i] = line.split(":")[1].strip()
-                                line = file.readline()
+					if line.split(":")[1].strip() == 'on':
+						self.fans[i] = FAN_ON
+					else:
+						self.fans[i] = FAN_OFF
+					line = file.readline()
+
+		# Update processor frequency
+		pr = os.listdir("/proc/acpi/processor")[0]
+		f = open("/proc/acpi/processor/"+pr+"/performance","r")
+		l = f.readline()
+		while(len(l)!=0):
+			if l.find("*") > -1:
+				self.freq = l.split(":")[1].strip().split(",")[0]
+			l = f.readline()
+		f.close()
+
+
 
 	def percent(self):
 		"""Returns percentage capacity of all batteries"""
@@ -273,3 +313,19 @@ class AcpiLinux:
 
 	def fan_state(self):
 		return self.fans
+
+	def performance_states(self):
+		return self.perf_states.keys()
+
+	def frequency(self):
+		return self.freq
+
+	def setFrequency(self,f):
+		if self.perf_states.has_key(f):
+			state = self.perf_states[f]
+			pr = os.listdir("/proc/acpi/processor")[0]
+			f = open("/proc/acpi/processor/"+pr+"/performance","w")		
+			f.write(state)
+			return FREQ_CHANGED
+		else:
+			return ERROR
