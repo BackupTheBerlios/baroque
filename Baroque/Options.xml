@@ -14,7 +14,6 @@
 				<numentry name='ticks_till_update' label='Tenths of a second to wait between updates:' min='0' max='100' step='10'>
 				This determines, in tenths of a second, how long to wait between updates.
 				</numentry>
-				<label>milliseconds</label>
 			</hbox>
 		</frame>
 
