@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <AppInfo>
-  <Summary>A battery state applet for the ROX desktop</Summary>
+  <Summary>Baroque - Scanning the signals at night for battery status</Summary>
   <Summary xml:lang="de">Ein Batteriestatus-Applet f&#xFC;r den ROX-Desktop</Summary>
   <About>
-    <Purpose>Battery state applet</Purpose>
-    <Version>0.4.0 (26-Jun-2003)</Version>
-    <Author>Tilo Riemer</Author>
+    <Purpose>Battery state applet for ROX</Purpose>
+    <Version>0.5.0 (26-Jun-2003)</Version>
+    <Author>Rds and Tilo Riemer</Author>
     <License>BSD License</License>
-    <Homepage>http://www.iapp.de/~riemer/projects/baroque</Homepage>
+    <Homepage>http://www.rdsarts.com/code/batmon or http://www.iapp.de/~riemer/projects/baroque</Homepage>
   </About>
   <About xml:lang="de">
-    <Purpose label="Zweck">Batteriestatus-Applet</Purpose>
-    <Version>0.4.0 (26. Juni 2003)</Version>
-    <Author label="Autor">Tilo Riemer</Author>
+    <Purpose label="Zweck">Batteriestatus-Applet f&#xFC;r ROX</Purpose>
+    <Version>0.5.0 (26. Juni 2003)</Version>
+    <Author label="Autor">Rds und Tilo Riemer</Author>
     <License label="Lizenz">BSD License</License>
-    <Homepage>http://www.iapp.de/~riemer/projects/baroque</Homepage>
+    <Homepage>http://www.rdsarts.com/code/batmon oder http://www.iapp.de/~riemer/projects/baroque</Homepage>
   </About>
 </AppInfo>

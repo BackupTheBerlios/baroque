@@ -2,10 +2,13 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.20 2003/10/26 00:10:39 riemer Exp $
+## $Id: AppletRun,v 1.21 2003/12/01 13:45:35 riemer Exp $
 ##
-## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
-## All rights reserved. 
+## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
+##                         Tilo Riemer <riemer@lincvs.org>
+## All rights reserved.
+##
+## Baroque is a merge of BatMonitor and the old Baroque
 ##
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions
@@ -17,9 +20,9 @@
 ##    notice, this list of conditions and the following disclaimer in the
 ##    documentation and/or other materials provided with the distribution.
 ## 3. The name of the author may not be used to endorse or promote products
-##    derived from this software without specific prior written permission. 
+##    derived from this software without specific prior written permission.
 ##
-## THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+## THIS SOFTWARE IS PROVIDED BY THE AUTHOR `AS IS'' AND ANY EXPRESS OR
 ## IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 ## OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 ## IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
@@ -33,120 +36,88 @@
 ###############################################################################
 
 
-import findrox
+import findrox; findrox.version(1, 9, 8)
 import rox
-from rox import g
+from rox import g, applet, Menu
+from rox.options import Option
 import sys
-from rox import applet
-import time, string, os
 
 
-#intervall which is used for updating apm info... (milliseconds)
-CHECK_INTERVALL = 10000
+rox.setup_app_options('Baroque')
 
-#opens a message box if percentage battery capacity is less than WARN_LEVEL
-WARN_LEVEL = 20   #warn if battery capacity is less or equal than WARN_LEVEL
+import baroque
 
-#use ACPI or APM
-TYPE_ACPI = 0
-TYPE_APM  = 1
+rox.app_options.notify()
+Menu.set_save_name('Baroque')
+menu = Menu.Menu( 'main', [
+				('/Baroque',	'',				''),
+				('/Options',	'show_options',		''),
+				('/Quit',		'quit',			''),
+				])
 
+# TODO: Move this into one class. Should not be two.
+class baroque_app(applet.Applet):
+	def __init__(self):
 
-type = TYPE_ACPI
-
-cur_warn_level = 0
-cur_default_warn_level = 0
-app_dir = ""
-
-
-#init display
-battery_display = g.Label("")
-battery_display.set_justify(g.JUSTIFY_RIGHT)
-
-
-
-def update_display(battery):
-	global cur_warn_level
-	global cur_default_warn_level
-	global app_dir
-	global type
-	global battery_display
-
-	if type == TYPE_ACPI:
-		try:	
-			battery.update()
-		except AcpiError:
-			#TODO: handling of exception
-			pass
-	else:		
-		battery.update()
-			
-	percent = battery.percent()
-	percent_str = str(percent) + "%"
-
-	if type == TYPE_ACPI:
-		cap_time_str = str(battery.capacity()) + "\nmWh"
-		offline_state = acpi.OFFLINE 
-	else:
-		hours = battery.time() / 60
-		mins  = battery.time() % 60
-		cap_time_str = str(hours) + ":%(mins)02d" % vars()
-		offline_state = apm.OFFLINE 
-
-	txt = percent_str + "\n" + cap_time_str
-	battery_display.set_text(txt)
-
-	if battery.charging_state() == offline_state:
-		if percent <= cur_warn_level:
-			cur_warn_level = percent
-			os.system(app_dir + "/alert.py " + str(cur_warn_level) + "&")
-			cur_warn_level = cur_warn_level * 2 / 3	 #decrease warn level
-	else:
-		cur_warn_level = cur_default_warn_level
-	
-	return 1
-	
-
-#check run mode (applet or normal application?)
-if len(sys.argv) > 1:
-	main = applet.Applet(sys.argv[1])
-else:
-	main = rox.Window()
-
-
-#hack?
-app_dir = sys.argv[0].split("AppletRun")[0]
-
-
-try:
-	import acpi
-	battery = acpi.Acpi()
-	type = TYPE_ACPI
-except ImportError:
-	#no ACPI module found -> try APM
-	try:
-		import apm
-		battery = apm.Apm()
-		type = TYPE_APM
-	except ImportError:
-		#no APM module found -> exit
-		error_msg = "Neither APCI nor APM module found.\n"
-		error_msg = error_msg + "Install one of these modules (see http://www.iapp.de/~riemer/projects/)"
-		sys.exit(error_msg)
+		def update_tooltip():
+			box.tooltip.set_tip(self, 'Charge: ' + box.percent() + '%')
+			return 1
 		
+		applet.Applet.__init__(self, sys.argv[1])
+		box = baroque.boxes()
+		self.add(box)
+		self.add_events(g.gdk.BUTTON_PRESS_MASK)
+		self.connect('button-press-event', self.button_press)
+		
+		menu.attach(self, self)
+		g.timeout_add(5000, update_tooltip)
+		update_tooltip()
 
-
-cur_warn_level = WARN_LEVEL
-cur_default_warn_level = WARN_LEVEL
-
-
-update_display(battery)
-
+		
+	def button_press(self, window, event):
+		if event.button == 3:
+			menu.popup(self, event)
+			
+	def quit(self):
+		# Night, night.
+		self.destroy()
 	
-main.set_border_width(6)
-main.add(battery_display)
-main.show_all()
+	def show_options(self):
+		rox.edit_options()
 
-g.timeout_add(CHECK_INTERVALL, update_display, battery)
+class baroque_win(rox.Window):
+	def __init__(self):
 
+		def update_tooltip():
+			box.tooltip.set_tip(self, 'Charge: ' + box.percent() + '%')
+			return 1
+		
+		rox.Window.__init__(self)
+		box = baroque.boxes()
+		self.add(box)
+		self.add_events(g.gdk.BUTTON_PRESS_MASK)
+		self.connect('button-press-event', self.button_press)
+		
+		menu.attach(self, self)
+		g.timeout_add(5000, update_tooltip)
+		update_tooltip()
+
+	def button_press(self, window, event):
+		if event.button == 3:
+			menu.popup(self, event)
+			
+	def quit(self):
+		# Night, night.
+		self.destroy()
+	
+	def show_options(self):
+		rox.edit_options()
+
+# App or window? CHOOSE NOW! *cue music*
+if len(sys.argv) > 1:
+	main = baroque_app()
+else:
+	main = baroque_win()
+
+main.show()
 rox.mainloop()

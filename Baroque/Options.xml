@@ -1,0 +1,53 @@
+<?xml version='1.0'?>
+<options>
+	<section title='First section'>
+		<frame label='Battery Options'>
+    
+			<toggle name='warn' label='Display a warning when Battery is low?'>
+			      When you want to have the applet display a box when the battery has reached a certain percentage, select this.
+			</toggle>
+    
+			<numentry name='warn_level' label='Percentage to warn at:' min='0' max='100' step='1'>
+			    	Set the percentage at which a warning will be displayed, if desired. At around 10%, your battery will be reaching it's last legs, and at 5% it's officially time to find a wall-outlet.
+			</numentry>
+			<hbox>
+				<numentry name='ticks_till_update' label='Time to wait between updates:' min='0' max='10000' step='1'>
+					This determines, in milliseconds, how long to wait between updates.
+				</numentry>
+				<label>milliseconds</label>
+			</hbox>
+		</frame>
+
+		<frame label="Applet-Specific Options">
+			<hbox>
+			<frame label='Make applet'>
+				<vbox>
+					<hbox>
+						<numentry name='applet_height' label='' min='10' max='100' step='1'>
+							How tall should the applet appear upon the panel? This changes the horizontal size of your applet, and if you are using a vertical panel it shall expand to keep it within boundaries.
+						</numentry>
+						<label> Tall</label>
+					</hbox>
+
+					<hbox>
+						<numentry name='applet_width' label='' min='10' max='100' step='1'>
+							In the early 1800s, applets were fattened for their rich, meaty taste and pleasing texture. Today, they grow solely to be more visible on your panel. This value determines how wide your applet appears, and if used on vertical panels, they will widen to accommodate if it not already wide enough.
+						</numentry>
+						<label> Wide</label>
+					</hbox>
+				</vbox>
+			</frame>
+				<spacer/>
+				<vbox>
+				    	<toggle name="LABEL_IN_BAR" label="Display text in meter?">
+				    		If you do, it will no longer have a running display of battery info under the meter, but will rather place it inside. This saves vertical space, so if you run a horizontal panel and want to save space, this is the time to do it.
+	    				</toggle>
+    					<spacer/>
+	    				<numentry name="text_height" label="Font size" min='1' max='100' step='1'>
+	    					This is the font size at which the text will be display if not in the battery meter. If it's in the meter, it will be displayed at your default GTK+ 2 text width.
+	    				</numentry>
+				</vbox>
+			</hbox>
+		</frame>
+	</section>
+</options>

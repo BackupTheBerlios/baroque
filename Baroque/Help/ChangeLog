@@ -1,3 +1,25 @@
+changes of BatMonitor before megring with Baroque:
+
+2003-11-27 Rds <rds@rdsarts.com>
+
+	* added: some comments, cleaned up some things. 
+	Fixed the 'full battery freeze.'
+
+2003-11-26 Rds <rds@rdsarts.com>
+
+	* REALLY fixed dialog:
+	Fixed error-out dialog... I think.
+	Various spelling fixes in Options.xml
+
+2003-11-25 Rds <rds@rdsarts.com>
+
+	* fixed: warning dialog.
+
+2003-11-24 Rds <rds@rdsarts.com>
+
+	Changelog of BatMonitor started. ;)
+
+
 changes from 0.4.0 to 0.4.1:
 
 2003-09-08 Tilo Riemer <riemer@lincvs.org>
