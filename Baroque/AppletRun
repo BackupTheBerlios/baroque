@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.19 2003/09/08 19:57:52 riemer Exp $
+## $Id: AppletRun,v 1.20 2003/10/26 00:10:39 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -85,7 +85,7 @@ def update_display(battery):
 	percent_str = str(percent) + "%"
 
 	if type == TYPE_ACPI:
-		cap_time_str = str(battery.capacity()) + " mAh"
+		cap_time_str = str(battery.capacity()) + "\nmWh"
 		offline_state = acpi.OFFLINE 
 	else:
 		hours = battery.time() / 60
@@ -131,7 +131,7 @@ except ImportError:
 	except ImportError:
 		#no APM module found -> exit
 		error_msg = "Neither APCI nor APM module found.\n"
-		error_msg = error_msg + "Install one of these modules (see http://www.iapp.de/~riemer/projects/apm.py)"
+		error_msg = error_msg + "Install one of these modules (see http://www.iapp.de/~riemer/projects/)"
 		sys.exit(error_msg)
 		
 

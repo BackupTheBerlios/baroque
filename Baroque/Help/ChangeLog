@@ -7,7 +7,7 @@ changes from 0.4.0 to 0.4.1:
 
 2003-08-19 Tilo Riemer <riemer@lincvs.org>
 
-	* changed: catch exception from acpi.py (configuration 
+	* changed: catch exception from acpi.py (configuration- 
 	changed exception)
 
 	
@@ -50,4 +50,3 @@ changes from 0.1.0 to 0.2.0:
 
 	* add: support for Linux
 	* add: show warning if battery capacity is less than warn level
-	
