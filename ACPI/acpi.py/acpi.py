@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.20 2003/12/14 15:24:43 riemer Exp $
+## $Id: acpi.py,v 1.21 2003/12/14 16:14:04 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -38,7 +38,7 @@ import os,stat,sys
 
 #enums
 
-VERSION      = "0.2.0"
+VERSION      = "0.3.0"
 
 OFFLINE      =  0
 ONLINE       =  1
