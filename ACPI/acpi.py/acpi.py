@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.2 2003/06/30 19:05:06 sorgue Exp $
+## $Id: acpi.py,v 1.3 2003/07/01 13:03:33 sorgue Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -127,7 +127,9 @@ class Acpi:
 		"""Returns ac state (off-/online/charging)"""
 		return self.acpi.charging_state()
 	
-
+	def estimated_lifetime(self):
+		"""Returns Estimated Lifetime"""
+		return self.acpi.estimated_lifetime()
 
 
 
@@ -149,6 +151,7 @@ class AcpiLinux:
 		self.ac_line_state = OFFLINE
 		self.design_capacity = {}
 		self.life_capacity = {}
+		self.present_rate = {}
 
 		#initial reading of acpi info
 		self.initialize()
@@ -163,12 +166,11 @@ class AcpiLinux:
 			line = info_file.readline()
 			
 			while len(line) != 0:
-				if line.find("design capacity") == 0:
+				if line.find("design capacity:") == 0:
 					cap = line.split(":")[1].strip()
 					self.design_capacity[i] = int(cap.split("mWh")[0].strip())					
 				line = info_file.readline()
 			info_file.close()
-			
 			
 	def update(self):
 		"""Read /proc/acpi/battery/*/state and extract needed infos"""
@@ -178,8 +180,6 @@ class AcpiLinux:
 			line = state_file.readline()
 			
 			while len(line) != 0:
-				if (line.find("present")==0) and (line.find("no")>0):
-					self.life_capacity[i] = 0
 				if line.find("remaining capacity") == 0:
 					cap = line.split(":")[1].strip()
 					self.life_capacity[i] = int(cap.split("mWh")[0].strip())
@@ -197,16 +197,27 @@ class AcpiLinux:
 					else:
 						self.ac_line_state = ONLINE
 					
+				# Read the present energy consumption to 
+				# estimate life time 
+
+				if line.find("present rate:") == 0:
+					pr_rate = float(line.split(":")[1].strip().split("mW")[0].strip())
+					self.present_rate[i] = pr_rate
+
+
 				line = state_file.readline()
 			state_file.close()
 					
-		
+
+					
+
+
 	def percent(self):
 		"""Returns percentage capacity of all batteries"""
 		life_capacity = 0
 		design_capacity = 0
-		for i in self.batteries:
-			life_capacity = life_capacity + self.life_capacity[i]
+		for i,c in self.life_capacity.items():
+			life_capacity = life_capacity + c
 			design_capacity = design_capacity + self.design_capacity[i]
 		
 		return (life_capacity * 100) / design_capacity
@@ -215,8 +226,8 @@ class AcpiLinux:
 	def capacity(self):
 		"""Returns capacity of all batteries"""
 		capacity = 0
-		for i in self.batteries:
-			capacity = capacity + self.life_capacity[i]
+		for i,c in self.life_capacity.items():
+			capacity = capacity + c
 		return capacity
 
 
@@ -224,18 +235,16 @@ class AcpiLinux:
 		#returns the number of batteries
 		#if it returns 0, maybe ACPI is not available or 
 		#battery driver is not load
-		nb = len(self.batteries)
-		for i in self.batteries:
-			file = open(self.proc_battery_dir + "/" + i + "/state")
-			line = file.readline()
-			while len(line) != 0:
-				if (line.find("present")==0) and (line.find("no")>0):
-					nb = nb - 1
-				line = file.readline()
-			file.close()
-		return nb
+		return len(self.life_capacity)
 		
-
 
 	def charging_state(self):
 		return self.ac_line_state
+
+	def estimated_lifetime(self):
+		time = 0
+		for batt,life_capacity in self.life_capacity.items():
+			if self.present_rate[batt] == 0:
+				return "charging"
+			time = time + life_capacity/self.present_rate[batt]
+		return str(time)
