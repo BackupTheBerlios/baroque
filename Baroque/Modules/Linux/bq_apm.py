@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: bq_apm.py,v 1.1 2002/12/02 16:47:59 riemer Exp $
+## $Id: bq_apm.py,v 1.2 2002/12/09 22:43:55 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -30,18 +30,20 @@
 ##
 ###############################################################################
 
-import bq_consts
+
+#implementation for Linux
+
+
+import bq_consts, commands
 
 
 class CApm:
-	def __init__(self, apm_command):
-		self.apm_cmd = apm_command
+	def __init__(self):
+		self.apm_cmd = "apm"
 		self.ac_line_state = bq_consts.OFFLINE
-		self.cur_warn_level = bq_consts.WARN_LEVEL
-		self.alert_state = 0	#warn me if alert_state == 1
 		
-		self.life_percent = "0%"
-		self.life_time = "00:00"
+		self.life_percent = 0
+		self.life_time_string = "00:00"
 
 		#initial reading of apm info
 		self.update()
@@ -60,7 +62,6 @@ class CApm:
 		if lines[0].find("off-line") > 0:
 			self.ac_line_state = bq_consts.OFFLINE
 		else:
-			self.cur_warn_level = bq_consts.WARN_LEVEL
 			self.ac_line_state = bq_consts.ONLINE
 			
 	
@@ -71,24 +72,22 @@ class CApm:
 	
 		for i in items:
 			if i.find("%") > 0:
-				self.life_percent = i
+				self.life_percent = i.split("%")[0].strip()
 		
 			if (i.find("(") > -1) and (i.find(":") > 0) and (i.find(")") > 0):
-				self.life_time = i.split("(")[1].split(")")[0]
-			
-		#we do nothing return, the caller ask the class for life_* and states
+				self.life_time_string = i.split("(")[1].split(")")[0].strip()
 		
 	
-	def check_capacity(cap):
-		#check if capacity is less than WARN_LEVEL
-		#note that cap has to be a string ("x%")
-		cap_val = int(cap.split("%")[0])
+	def percent(self):
+		#returns percentage capacity of all batteries
+		return self.life_percent
+		
+		
+	def capacity_or_time_string(self):
+		#returns time string of all batteries
+		return self.life_time_string
 	
-		if self.alert_state == 0:
-			if (cap_val < self.cur_warn_level) and (self.ac_line_state == OFFLINE):
-				self.alert_state = 1
-				self.cur_warn_level = self.cur_warn_level * 2 / 3	 #decrease warn level
-		elif alert_state == 2:
-			alert_state = 0
-				
+	
+	def charging_state(self):
+		return self.ac_line_state
 	

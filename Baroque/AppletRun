@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.12 2002/12/09 01:28:28 riemer Exp $
+## $Id: AppletRun,v 1.13 2002/12/09 22:43:54 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -50,6 +50,7 @@ Linux   = 0
 
 
 cur_warn_level = 0
+cur_default_warn_level = 0
 app_dir = ""
 
 
@@ -63,18 +64,23 @@ def check_system():
 		
 def update_display(battery):
 	global cur_warn_level
+	global cur_default_warn_level
 	global app_dir
 	
 	battery.update()
+	percent = battery.percent()
 	
-	txt = str(battery.percent()) + "%\n" + str(battery.capacity()) + " mAh"
+	txt = str(percent) + "%\n" + str(battery.capacity_or_time_string()) 
 	apm_display.set_text(txt)
 
 	if battery.charging_state() == bq_consts.OFFLINE:
-		if (battery.percent() <= cur_warn_level):
-			os.system(app_dir + "/alert.py " + str(battery.percent()) + "&")
+		if (percent <= cur_warn_level):
+			cur_warn_level = percent
+			os.system(app_dir + "/alert.py " + str(cur_warn_level) + "&")
 			cur_warn_level = cur_warn_level * 2 / 3	 #decrease warn level
-
+	else:
+		cur_warn_level = cur_default_warn_level
+		
 	return 1
 	
 
@@ -102,13 +108,14 @@ sys.path.append(app_dir + "/Modules")
 
 #append system dependent path to module path
 if system == FreeBSD:
-	pass
+	sys.path.append(app_dir + "/Modules/FreeBSD")
 else:
 	sys.path.append(app_dir + "/Modules/Linux")
 
-import bq_consts, bq_acpi
+import bq_consts, bq_acpi, bq_apm
 
 cur_warn_level = bq_consts.WARN_LEVEL
+cur_default_warn_level = bq_consts.WARN_LEVEL
 
 battery = bq_acpi.CAcpi()
 if battery.nb_of_batteries() < 1:
@@ -126,138 +133,4 @@ main.show_all()
 
 g.timeout_add(CHECK_INTERVALL, update_display, battery)
 
-
 rox.mainloop()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#~ apm_cmd_freebsd = "/usr/sbin/apm"
-#~ apm_cmd_generic = "apm"
-
-
-
-#~ def check_capacity(cap):
-#~ #check for capacity and opens a message box if capacity is too less
-#~ #the code is a little bit obscure
-	#~ global alert_state
-	#~ global cur_warn_level
-
-	#~ cap_val = int(cap.split("%")[0])
-
-	#~ if alert_state == 0:
-		#~ if (cap_val < cur_warn_level) and (ac_line_state == OFFLINE):
-			#~ alert_state = 1
-			#~ msg = 'The capacity of battery is less than ' + str(cur_warn_level) + "%"
-			#~ rox.alert(msg)
-			#~ alert_state = 2
-			#~ cur_warn_level = cur_warn_level * 2 / 3	 #decrease warn level
-	#~ elif alert_state == 2:
-		#~ alert_state = 0
-			
-	#~ g.timeout_add(CHECK_INTERVALL, update_apm)
-
-
-#~ def update_apm_freebsd():
-	#~ global ac_line_state
-	
-	#~ percent_sum_found = 0
-	#~ time_sum_found    = 0
-	
-	#~ life_percent = "0%"
-	#~ life_time    = "00:00"
-
-	#~ #we reset LC_ALL because we need the english output from apm
-	#~ res = commands.getoutput("env LC_ALL=C " + apm_cmd_freebsd)
-	#~ lines = res.split("\n")
-	#~ for i in lines:
-		#~ if not percent_sum_found and (i.find("battery life") > 0):
-			#~ percent_sum_found = 1
-			#~ life_res = i.split(":")
-			#~ life_percent = life_res[1]
-			
-		#~ if not time_sum_found and (i.find("battery time") > 0):
-			#~ time_sum_found = 1
-			#~ life_res = i.split(": ")
-			#~ life_res2 = life_res[1].split(":")
-			#~ life_time = life_res2[0] + ":" + life_res2[1]
-
-		#~ if i.find("off-line") > 0:
-			#~ ac_line_state  = OFFLINE
-		#~ elif i.find("on-line") > 0:
-			#~ cur_warn_level = WARN_LEVEL
-			#~ ac_line_state  = ONLINE
-
-
-	#~ apm_display.set_text(life_percent + "\n" + life_time)
-	
-	#~ check_capacity(life_percent)
-	
-	#~ return 1
-
-
-
-#~ def update_apm_linux():
-	#~ global ac_line_state
-
-	#~ life_percent = "0%"
-	#~ life_time    = "00:00"
-
-	#~ #we reset LC_ALL because we need the english output from apm
-	#~ res = commands.getoutput("env LC_ALL=C " + apm_cmd_generic)
-	#~ #res = "AC off-line, battery status high: 100% (3:20)\n"
-	
-	#~ lines = res.split("\n")
-
-	#~ #we assume all info in the first (the one and only) line
-	#~ if lines[0].find("off-line") > 0:
-		#~ ac_line_state = OFFLINE
-	#~ else:
-		#~ cur_warn_level = WARN_LEVEL
-		#~ ac_line_state = ONLINE
-		
-
-	#~ #if lines[0].find("charging") > 0:
-		#~ #print "charging"
-
-	#~ items = lines[0].split()
-
-	#~ for i in items:
-		#~ if i.find("%") > 0:
-			#~ life_percent = i
-	
-		#~ if (i.find("(") > -1) and (i.find(":") > 0) and (i.find(")") > 0):
-			#~ life_time = i.split("(")[1].split(")")[0]
-		
-	#~ apm_display.set_text(life_percent + "\n" + life_time)
-	
-	#~ check_capacity(life_percent)
-	
-	#~ return 1
-
-
-
-#~ def update_apm():
-#~ #calls system dependent update funcs
-	#~ if system == FreeBSD:
-		#~ update_apm_freebsd()
-	#~ else:
-		#~ update_apm_linux()
-		
-
-
-

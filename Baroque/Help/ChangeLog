@@ -1,8 +1,13 @@
-changes from 0.1.0 to 0.2.0:
+changes from 0.2.0 to 0.3.0:
 
 2002-12-08 Tilo Riemer <riemer@lincvs.org>
 
 	* Linux: support for ACPI added 
+	* nonblocking warning boxes
+	* completely rewritten
+
+
+changes from 0.1.0 to 0.2.0:
 
 2002-11-19 Tilo Riemer <riemer@lincvs.org>
 

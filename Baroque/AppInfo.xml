@@ -3,7 +3,7 @@
   <Summary>A battery state applet for the ROX desktop</Summary>
   <About>
     <Purpose>Battery state applet</Purpose>
-    <Version>0.3.0 (10-Nov-2002)</Version>
+    <Version>0.3.0 (10-Dec-2002)</Version>
     <Author>Tilo Riemer</Author>
     <License>BSD License</License>
     <Homepage>http://www.lincvs.org</Homepage>

@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: bq_acpi.py,v 1.4 2002/12/09 00:48:06 riemer Exp $
+## $Id: bq_acpi.py,v 1.5 2002/12/09 22:43:55 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -52,7 +52,7 @@ class CAcpi:
 
 		#initial reading of acpi info
 		self.initialize()
-		self.check_charging_state()
+		self.update()
 
 
 	def initialize(self):
@@ -82,6 +82,11 @@ class CAcpi:
 					cap = line.split(":")[1].strip()
 					self.life_capacity[i] = int(cap.split("mAh")[0].strip())
 					
+				#a little bit tricky... if loading of ac driver fails, we cant use info
+				#from /proc/ac_*/...
+				#if information in /proc/acpi/battery/*/state is wrong we had to
+				#track the capacity history.
+				#I asume that all battery state file get the same state.
 				if line.find("charging state") == 0:
 					state = line.split(":")[1].strip()
 					if state == "discharging":
@@ -115,6 +120,11 @@ class CAcpi:
 		return capacity
 
 
+	def capacity_or_time_string(self):
+		#returns capacity string of all batteries
+		return str(self.capacity()) + " mAh"
+
+
 	def nb_of_batteries(self):
 		#returns the number of batteries
 		#if it returns 0, maybe ACPI is not available or 
@@ -124,28 +134,3 @@ class CAcpi:
 
 	def charging_state(self):
 		return self.ac_line_state
-		
-	
-	def check_charging_state(self):
-		#a little bit tricky... if loading of ac driver fails, we cant use info
-		#from /proc/ac_*/...
-		#if information in /proc/acpi/battery/*/state is wrong we had to
-		#track the capacity history.
-		#I asume that all battery state file get the same state.
-		for i in self.batteries:
-			state_file = open(proc_battery_dir + "/" + i + "/state")
-			line = state_file.readline()
-			
-			while len(line) != 0:
-				if line.find("charging state") == 0:
-					state = line.split(":")[1].strip()
-					if state == "discharging":
-						self.ac_line_state = bq_consts.OFFLINE
-					elif state == "charging":
-						self.ac_line_state = bq_consts.CHARGING
-					else:
-						self.ac_line_state = bq_consts.ONLINE
-					
-				line = state_file.readline()
-			state_file.close()
-			

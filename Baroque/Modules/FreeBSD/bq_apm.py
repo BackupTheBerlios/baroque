@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-
 ##############################################################################
 ##
-## $Id: alert.py,v 1.2 2002/12/09 22:43:54 riemer Exp $
+## $Id: bq_apm.py,v 1.1 2002/12/09 22:43:55 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -33,11 +31,56 @@
 ###############################################################################
 
 
-import findrox
-import rox
-import sys
+#implementation for FreeBSD
+
+import bq_consts, commands
 
 
+class CApm:
+	def __init__(self):
+		self.apm_cmd = "/usr/sbin/apm"
+		self.ac_line_state = bq_consts.OFFLINE
+		
+		self.life_percent = 0
+		self.life_time_string = "00:00"
 
-msg = 'The capacity of battery is down to only ' + sys.argv[1] + "%!"
-rox.alert(msg)
+		#initial reading of apm info
+		self.update()
+	
+	
+	def update(self):
+		#call apm and extract needed infos
+		percent_sum_found = 0
+		time_sum_found    = 0
+		
+		#we reset LC_ALL because we need the english output from apm
+		res = commands.getoutput("env LC_ALL=C " + self.apm_cmd)
+		lines = res.split("\n")
+		for i in lines:
+			if not percent_sum_found and (i.find("battery life") > 0):
+				percent_sum_found = 1
+				self.life_percent = i.split(":")[1].split("%")[0].strip()
+				
+			if not time_sum_found and (i.find("battery time") > 0):
+				time_sum_found = 1
+				life_res = i.split(": ")[1].split(":")
+				self.life_time_string = life_res[0] + ":" + life_res[1]
+	
+			if i.find("off-line") > 0:
+				self.ac_line_state  = bq_consts.OFFLINE
+			elif i.find("on-line") > 0:
+				self.ac_line_state  = bq_consts.ONLINE
+		
+	
+	def percent(self):
+		#returns percentage capacity of all batteries
+		return self.life_percent
+		
+		
+	def capacity_or_time_string(self):
+		#returns time string of all batteries
+		return self.life_time_string
+	
+	
+	def charging_state(self):
+		return self.ac_line_state

@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-
 ##############################################################################
 ##
-## $Id: alert.py,v 1.2 2002/12/09 22:43:54 riemer Exp $
+## $Id: bq_acpi.py,v 1.1 2002/12/09 22:43:55 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -32,12 +30,16 @@
 ##
 ###############################################################################
 
+import bq_consts
 
-import findrox
-import rox
-import sys
-
-
-
-msg = 'The capacity of battery is down to only ' + sys.argv[1] + "%!"
-rox.alert(msg)
+class CAcpi:
+	def __init__(self):
+		#init ACPI - dummy
+		pass
+	
+	def nb_of_batteries(self):
+		#returns the number of batteries
+		#if it returns 0, maybe ACPI is not available or 
+		#battery driver is not load
+		return 0
+		
