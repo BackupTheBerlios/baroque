@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.22 2003/12/15 15:58:58 riemer Exp $
+## $Id: acpi.py,v 1.23 2003/12/15 20:04:09 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -229,7 +229,7 @@ class AcpiLinux:
 #check info for present: no
 		try:
 			for i in self.battery_dir_entries:
-				print self.proc_battery_dir + "/" + i + "/info"
+				#print self.proc_battery_dir + "/" + i + "/info"
 				info_file = open(self.proc_battery_dir + "/" + i + "/info")
 				line = info_file.readline()
 			
@@ -245,7 +245,7 @@ class AcpiLinux:
 					line = info_file.readline()
 				info_file.close()
 		except IOError:
-			print "No batt info found."
+			#print "No batt info found."
 			# the battery module is not correctly loaded... the file info should exist.
 			# wipe out all lists --> no battery infos
 			self.battery_dir_entries = []
@@ -511,8 +511,8 @@ class AcpiLinux:
 
 	# we need funcs like max_temperature and average_temperature
 	def temperature(self, idx):
-		print self.temperatures
-		print self.thermal_dir_entries[idx]
+		#print self.temperatures
+		#print self.thermal_dir_entries[idx]
 		return self.temperatures(self.thermal_dir_entries(idx))
 
 
