@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.1 2003/04/10 20:20:48 riemer Exp $
+## $Id: acpi.py,v 1.2 2003/06/30 19:05:06 sorgue Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -31,7 +31,7 @@
 ###############################################################################
 
 
-import os
+import os,stat,sys
 
 
 #enums
@@ -114,7 +114,7 @@ class Acpi:
 
 		
 	def capacity(self):
-		"""Returns capacity of all batteries (in mAh)"""
+		"""Returns capacity of all batteries (in mWh)"""
 		return self.acpi.capacity()
 
 	
@@ -165,9 +165,7 @@ class AcpiLinux:
 			while len(line) != 0:
 				if line.find("design capacity") == 0:
 					cap = line.split(":")[1].strip()
-					self.design_capacity[i] = int(cap.split("mAh")[0].strip())
-					break
-					
+					self.design_capacity[i] = int(cap.split("mWh")[0].strip())					
 				line = info_file.readline()
 			info_file.close()
 			
@@ -180,10 +178,11 @@ class AcpiLinux:
 			line = state_file.readline()
 			
 			while len(line) != 0:
+				if (line.find("present")==0) and (line.find("no")>0):
+					self.life_capacity[i] = 0
 				if line.find("remaining capacity") == 0:
 					cap = line.split(":")[1].strip()
-					self.life_capacity[i] = int(cap.split("mAh")[0].strip())
-					
+					self.life_capacity[i] = int(cap.split("mWh")[0].strip())
 				#a little bit tricky... if loading of ac driver fails, we cant use info
 				#from /proc/ac_*/...
 				#if information in /proc/acpi/battery/*/state is wrong we had to
@@ -200,7 +199,7 @@ class AcpiLinux:
 					
 				line = state_file.readline()
 			state_file.close()
-			
+					
 		
 	def percent(self):
 		"""Returns percentage capacity of all batteries"""
@@ -218,7 +217,6 @@ class AcpiLinux:
 		capacity = 0
 		for i in self.batteries:
 			capacity = capacity + self.life_capacity[i]
-			
 		return capacity
 
 
@@ -226,8 +224,18 @@ class AcpiLinux:
 		#returns the number of batteries
 		#if it returns 0, maybe ACPI is not available or 
 		#battery driver is not load
-		return len(self.batteries)
+		nb = len(self.batteries)
+		for i in self.batteries:
+			file = open(self.proc_battery_dir + "/" + i + "/state")
+			line = file.readline()
+			while len(line) != 0:
+				if (line.find("present")==0) and (line.find("no")>0):
+					nb = nb - 1
+				line = file.readline()
+			file.close()
+		return nb
 		
+
 
 	def charging_state(self):
 		return self.ac_line_state
