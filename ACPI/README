@@ -2,8 +2,7 @@ Introduction
 ============
 
 The goal of acpi.py is providing of an uniform and platform
-independent interface to ACPI. At the moment it implements only
-battery relevant functions. The interface is not stable yet.
+independent interface to ACPI. The interface is not stable yet.
 
 Because I don't have dozens of laptops and operating systems
 I need help! It would be great to have a Python modul which

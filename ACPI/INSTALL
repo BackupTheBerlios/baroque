@@ -9,8 +9,6 @@ Therefore a low level modul is not needed. Copy the file
 acpi.py from the acpi.py directory into your Python 
 directory/site-packages (in most cases you must be root for 
 that). 
-Be sure that the ACPI battery driver is loaded (you will have a
-/proc/acpi/battery directory)
+Be sure that the desired ACPI drivers are loaded (you will have
+/proc/acpi/* directories)
 That's all.
-
-This version is tested with SuSE 8.1 and Linux 2.4.19.
