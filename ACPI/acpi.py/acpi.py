@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.25 2003/12/20 06:22:28 rds Exp $
+## $Id: acpi.py,v 1.26 2004/01/07 07:15:44 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>,
 ##                         Luc Sorgue  <luc.sorgue@laposte.net> and
@@ -229,9 +229,17 @@ class AcpiLinux:
 			pass
 		
 		self.ac_line_state = OFFLINE
+		self.capacities_read = 0
+		self.set_batteries_total_cap()
 
 #later: the newer acpi versions seems to generate always two BAT dirs...
 #check info for present: no
+	def set_batteries_total_cap(self):
+		"""
+			Parses through what we have, setting total battery capacity.
+			Should be called whenever a new battery is inserted.
+		"""
+
 		try:
 			for i in self.battery_dir_entries:
 				#print self.proc_battery_dir + "/" + i + "/info"
@@ -243,6 +251,7 @@ class AcpiLinux:
 						cap = line.split(":")[1].strip()
 						try:
 							self.design_capacity[i] = int(cap.split("m")[0].strip())
+							self.capacities_read += 1
 						except ValueError:
 							#no value --> conversion to int failed
 							self.design_capacity[i] = 0
@@ -257,7 +266,7 @@ class AcpiLinux:
 			self.design_capacity = {}
 			self.life_capacity = {}
 			self.present_rate = {}
-
+			self.capacities_read = 0
 
 	def update_batteries(self):
 		"""Read current state of batteries"""
@@ -316,7 +325,12 @@ class AcpiLinux:
 			# I prefer raising an exception because we would run into a recursion of
 			# member funcs what is not a good idea.
 			# the case that this error occurs should be very rare
-			
+		# print self.capacities_read
+		# print self.life_capacity
+		
+		if self.capacities_read != len(self.life_capacity):
+			self.set_batteries_total_cap()
+
 
 	def init_temperatures(self):
 		"""Initializes temperature stuff"""

@@ -2,6 +2,11 @@ changes from 0.3.0 to 0.4.0:
 
 Rds <rds@rdsarts.com>
 
+	* Fixed: Error that popped up if initiated without
+		a battery, then one later inserted.
+
+Rds <rds@rdsarts.com>
+
 	* Added: nb_of_fans routine
 	* Changed: Made the percent() routine use try/except 
 	* Added: some complexity to test.py.
