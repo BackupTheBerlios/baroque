@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.9 2003/08/14 18:30:48 riemer Exp $
+## $Id: acpi.py,v 1.10 2003/08/15 07:46:45 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -194,7 +194,7 @@ class AcpiLinux:
 			
 
 		try:
-			for i in batteries_dir_entries:
+			for i in battery_dir_entries:
 				mode = os.stat(self.proc_battery_dir + "/" + i)[stat.ST_MODE]
 				if stat.S_ISDIR(mode):
 					self.battery_dir_entries.append(i)
