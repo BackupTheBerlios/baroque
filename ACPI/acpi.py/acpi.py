@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.17 2003/08/25 12:09:39 riemer Exp $
+## $Id: acpi.py,v 1.18 2003/10/26 00:09:52 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -45,8 +45,6 @@ ONLINE       =  1
 CHARGING     =  2   #implies ONLINE
 FAN_OFF      =  0
 FAN_ON       =  1
-FREQ_CHANGED =  1
-ERROR        =  0
 
 
 
@@ -142,8 +140,6 @@ class Acpi:
 		"""Returns Estimated Lifetime"""
 		return self.acpi.estimated_lifetime()
 
-
-#ab hier pro Lüfter/Processor etc.?
 	def temperature(self, idx):
 		"""Returns Processor Temperature"""
 		return self.acpi.temperature(idx)
@@ -152,6 +148,8 @@ class Acpi:
 		"""Returns fan states"""
 		return self.acpi.fan_state(idx)
 
+
+#unfinished: don't use it or better send us improvements ;-)
 	def frequency(self, idx):
 		""" Return  the frequency of the processor"""
 		return self.acpi.frequency(idx)
@@ -174,7 +172,7 @@ class AcpiLinux:
 
 		#we read all acpi stuff from here
 		self.proc_acpi_dir = "/proc/acpi"
-		#self.proc_acpi_dir = "/home/riemer/proc/acpi"
+		#self.proc_acpi_dir = "/home/riemer/test/proc-rob/acpi"
 		
 		self.init_batteries()
 		self.init_fans()
@@ -227,6 +225,8 @@ class AcpiLinux:
 		
 		self.ac_line_state = OFFLINE
 
+#later: the newer acpi versions seems to generate always two BAT dirs...
+#check info for present: no
 		try:
 			for i in self.battery_dir_entries:
 				info_file = open(self.proc_battery_dir + "/" + i + "/info")
@@ -277,7 +277,7 @@ class AcpiLinux:
 					# from /proc/ac_*/...
 					# if information in /proc/acpi/battery/*/state is wrong we had to
 					# track the capacity history.
-					# I asume that all battery state files get the same state.
+					# I assume that all battery state files get the same state.
 					if line.find("charging state") == 0:
 						state = line.split(":")[1].strip()
 						if state == "discharging":
@@ -511,12 +511,12 @@ class AcpiLinux:
 	# we need funcs like max_temperature and average_temperature
 	def temperature(self, idx):
 		#print self.temperatures
-		return self.temperatures[idx]
+		return self.temperatures[self.thermal_dir_entries[idx]]
 
 
 	def fan_state(self, idx):
 		#print self.fans
-		return self.fans[idx]
+		return self.fans[self.fan_dir_entries[idx]]
 
 
 	def performance_states(self, idx):
