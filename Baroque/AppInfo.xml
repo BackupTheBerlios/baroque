@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <AppInfo>
   <Summary>A battery state applet for the ROX desktop</Summary>
-  <Summary xml:lang="de">Ein Batteriestatus-Applet fuer den ROX-Desktop</Summary>
+  <Summary xml:lang="de">Ein Batteriestatus-Applet f&#xFC;r den ROX-Desktop</Summary>
   <About>
     <Purpose>Battery state applet</Purpose>
     <Version>0.4.0 (26-Jun-2003)</Version>
