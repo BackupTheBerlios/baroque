@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.8 2002/11/15 23:49:07 riemer Exp $
+## $Id: AppletRun,v 1.9 2002/11/19 23:43:11 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -43,7 +43,7 @@ import commands
 
 
 #opens a message box if percentage battery capacity is less than WARN_LEVEL
-WARN_LEVEL = 10 #warn if less than 10%
+WARN_LEVEL = 16 #warn if less than 10%
 
 #intervall which is used for calling apm...
 CHECK_INTERVALL = 10000
@@ -94,20 +94,26 @@ def check_capacity(cap):
 def update_apm_freebsd():
 	global ac_line_state
 	
+	percent_sum_found = 0
+	time_sum_found    = 0
+	
 	life_percent = "0%"
-	life_time    = "00:00:00"
+	life_time    = "00:00"
 
 	#we reset LC_ALL because we need the english output from apm
 	res = commands.getoutput("env LC_ALL=C " + apm_cmd_freebsd)
 	lines = res.split("\n")
 	for i in lines:
-		if i.find("battery life") > 0:
+		if (i.find("battery life") > 0) and not percent_sum_found:
+			percent_sum_found = 1
 			life_res = i.split(":")
 			life_percent = life_res[1]
 			
-		if i.find("battery time") > 0:
+		if (i.find("battery time") > 0) and not time_sum_found:
+			time_sum_found = 1
 			life_res = i.split(": ")
-			life_time = life_res[1]
+			life_res2 = life_res[1].split(":")
+			life_time = life_res2[0] + ":" + life_res2[1]
 
 		if i.find("off-line") > 0:
 			ac_line_state  = OFFLINE
@@ -135,11 +141,11 @@ def update_apm_linux():
 	#res = "AC off-line, battery status high: 100% (3:20)\n"
 	
 	lines = res.split("\n")
-	
+
 	#we assume all info in the first (the one and only) line
 	if lines[0].find("off-line") > 0:
 		ac_line_state = OFFLINE
-	elif i.find("on-line") > 0:
+	else:
 		cur_warn_level = WARN_LEVEL
 		ac_line_state = ONLINE
 		
