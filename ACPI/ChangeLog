@@ -1,5 +1,9 @@
 changes from 0.2.0 to 0.3.0:
 
+2003-12-15 Rds <rds@rdsarts.com>
+
+	* added: support for Linux kernel 2.6.
+	
 2003-12-14 Tilo Riemer <riemer@lincvs.org>
 	
 	* fixed: estimated_lifetime returns always
