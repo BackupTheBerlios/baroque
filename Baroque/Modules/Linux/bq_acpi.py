@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: bq_acpi.py,v 1.2 2002/12/05 07:27:40 riemer Exp $
+## $Id: bq_acpi.py,v 1.3 2002/12/08 09:40:08 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -30,49 +30,126 @@
 ##
 ###############################################################################
 
-import bq_consts, os
+import bq_consts, os, stat
 
-proc_battery_dir = "/proc/acpi/battery"
+#proc_battery_dir = "/proc/acpi/battery"
+proc_battery_dir = "/home/riemer/fix/Baroque/acpi/battery"
 
 class CAcpi:
 	def __init__(self):
 		#init ACPI class and check for batteries in /proc/acpi/battery
-		self.batteries = os.listdir(proc_battery_dir)
+		batteries_dir_entries = os.listdir(proc_battery_dir)
+		
+		self.batteries = []
+		for i in batteries_dir_entries:
+			mode = os.stat(proc_battery_dir + "/" + i)[stat.ST_MODE]
+			if stat.S_ISDIR(mode):
+				self.batteries.append(i)
 		
 		self.ac_line_state = bq_consts.OFFLINE
 		self.cur_warn_level = bq_consts.WARN_LEVEL
 		self.alert_state = 0	#warn me if alert_state == 1
-		
-		self.life_percent = "0%"
-		self.life_capacity = "0 mAh"
+
+		self.design_capacity = {}
+		self.life_capacity = {}
 
 		#initial reading of acpi info
 		self.initialize()
+		self.check_charging_state()
 
 	def initialize(self):
 		#read /proc/acpi/battery/*/info and extract needed infos
 		for i in self.batteries:
-			state_file = open(i + "/info")
-			line = state_file.readline()
-			if line.find("design capacity"):
-				design_capacity = line.split(":")[1].strip()
-wieder pro batterie, als 100% nehmen
-
-
+			info_file = open(proc_battery_dir + "/" + i + "/info")
+			line = info_file.readline()
+			
+			while len(line) != 0:
+				if line.find("design capacity") == 0:
+					cap = line.split(":")[1].strip()
+					self.design_capacity[i] = int(cap.split("mAh")[0].strip())
+					print self.design_capacity[i], "mAh"
+					break
+					
+				line = info_file.readline()
+			info_file.close()
+			
+			
 	def update(self):
 		#read /proc/acpi/battery/*/state and extract needed infos
 		for i in self.batteries:
-			state_file = open(i + "/state")
+			state_file = open(proc_battery_dir + "/" + i + "/state")
 			line = state_file.readline()
-			if line.find("remaining capacity"):
-				self.life_capacity = line.split(":")[1].strip()
-hier noch das ganze auf mehrere batterien aufsplitten und verrechnen				
+			
+			while len(line) != 0:
+				if line.find("remaining capacity") == 0:
+					cap = line.split(":")[1].strip()
+					self.life_capacity[i] = int(cap.split("mAh")[0].strip())
+					print self.life_capacity[i] , "mAh"
+					
+				if line.find("charging state") == 0:
+					state = line.split(":")[1].strip()
+					if state == "discharging":
+						self.ac_line_state = bq_consts.OFFLINE
+					elif state == "charging":
+						self.ac_line_state = bq_consts.CHARGING
+					else:
+						self.ac_line_state = bq_consts.ONLINE
+					
+				line = state_file.readline()
+			state_file.close()
 			
 		
-	
+	def percent(self):
+		#returns percentage capacity of all batteries
+		life_capacity = 0
+		design_capacity = 0
+		for i in self.batteries:
+			life_capacity = life_capacity + self.life_capacity[i]
+			design_capacity = design_capacity + self.design_capacity[i]
+		
+		return (life_capacity * 100) / design_capacity
+
+
+	def capacity(self):
+		#returns capacity of all batteries
+		capacity = 0
+		for i in self.batteries:
+			capacity = capacity + self.life_capacity[i]
+			
+		return capacity
+
+
 	def nb_of_batteries(self):
 		#returns the number of batteries
 		#if it returns 0, maybe ACPI is not available or 
 		#battery driver is not load
 		return len(self.batteries)
 		
+
+	def charging_state(self):
+		return self.ac_line_state
+		
+	
+	def check_charging_state(self):
+		#a little bit tricky... if loading of ac driver fails, we cant use info
+		#from /proc/ac_*/...
+		#if information in /proc/acpi/battery/*/state is wrong we had to
+		#track the capacity history.
+		#I asume that all battery state file get the same state.
+		for i in self.batteries:
+			state_file = open(proc_battery_dir + "/" + i + "/state")
+			line = state_file.readline()
+			
+			while len(line) != 0:
+				if line.find("charging state") == 0:
+					state = line.split(":")[1].strip()
+					if state == "discharging":
+						self.ac_line_state = bq_consts.OFFLINE
+					elif state == "charging":
+						self.ac_line_state = bq_consts.CHARGING
+					else:
+						self.ac_line_state = bq_consts.ONLINE
+					
+				line = state_file.readline()
+			state_file.close()
+			
