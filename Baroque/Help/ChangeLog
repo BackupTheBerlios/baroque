@@ -3,6 +3,8 @@ changes from 0.5.1 to 0.6.0:
 2004-01-07 Rds <rds@rdsarts.com>
 
 	* Fixed: Logic in lifetime display code.
+	* Fixed: Fonts. They now look spiffy. :)
+		Still need to fix the Options.xml file, though.
 
 2004-01-03 Rds <rds@rdsarts.com>
 

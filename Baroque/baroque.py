@@ -1,6 +1,6 @@
 ############################################################################
 ##
-## $Id: baroque.py,v 1.10 2004/01/07 06:54:11 rds Exp $
+## $Id: baroque.py,v 1.11 2004/01/07 08:05:52 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -37,6 +37,7 @@
 import rox
 from rox import g
 from rox.options import Option
+import pango
 
 batt_type = -1	# 0 = ACPI, 1 = APM
 
@@ -88,10 +89,10 @@ class boxes(g.VBox):
 	warn_level = Option('warn_level', 10)
 	applet_width = Option('applet_width', 100)
 	applet_height = Option('applet_height', 20)
+	text_font = Option('text_font', 'Sans 12')
 	text_height = Option('text_height', 10)
 	ticks_till_update = Option('ticks_till_update', "1000")
 	LABEL_IN_BAR = Option('LABEL_IN_BAR', True)
-
 
 	#init class variables
 	warned = False
@@ -111,6 +112,7 @@ class boxes(g.VBox):
 			g.timeout_remove(self.update_timeout)
 			self.update_display(battery)
 			# print str(int(self.ticks_till_update.int_value) * 100)
+			print self.text_font			
 			self.set_size_request(self.applet_width.int_value, -1)
 			self.update_timeout = g.timeout_add(int(self.ticks_till_update.int_value) * 100, self.update_display, battery)
 
@@ -123,6 +125,7 @@ class boxes(g.VBox):
 		self.connect('destroy', destroyed)
 		self.pack_start(self.percent_display, 1, 1, 2)
 		self.pack_start(self.battery_display, 1, 1, 2)
+		self.percent_display.set_size_request(-1,10)
 		self.set_size_request(self.applet_width.int_value, -1)
 		self.update_display(battery)
 		self.battery_display.set_justify(g.JUSTIFY_CENTER)
@@ -188,9 +191,15 @@ class boxes(g.VBox):
 #			self.battery_display.show()
 
 		self.percent_display.set_text(txt)
-		print 'TODO: Fix this! Should be handled by editing the pango stuffs, or maybe editing the style?'
-		self.battery_display.set_markup('<span foreground="black" size="'+ 
-			str(self.text_height.int_value) + '000">' + txt + ' </span>')
+		# print 'TODO: Fix this! Should be handled by editing the pango stuffs, or maybe editing the style?'
+		# print '<span font_desc="'+ str(self.text_font.value) + '">' + txt + ' </span>'
+		# self.battery_display.set_markup('<span font_desc="'+ str(self.text_font.value) + '">' + txt + ' </span>')
+		# Note to self: If I ever have to mess with fonts again, NEVER DO IT WITHOUT PANGO. ;)
+		# 	Gads, it was so much easier...
+		
+		label_font = pango.FontDescription(self.text_font.value)
+		self.battery_display.modify_font(label_font)
+		self.battery_display.set_markup(txt)
 
 		label_display = self.LABEL_IN_BAR.value
 

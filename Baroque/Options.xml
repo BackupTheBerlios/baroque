@@ -59,6 +59,9 @@
 					</radio-group>
 					</frame>
 				</vbox>
+				<font name="text_font" label="What font should text use?" min="1" max="100" step="1">
+					Sets the text font size of text when it's alone, or under the progress bar. This changes nothing if it is no visable, or inside the progress bar.
+				</font>
 			</hbox>
 		</frame>
 	</section>
