@@ -1,0 +1,135 @@
+ 2004-07-10 rds <rds@rdsarts.com>
+
+	* Committed: Splitted power.py and Baroque into
+		seperate packages.
+
+changes from 0.5.1 to 0.6.0:
+
+2004-04-26
+
+	* Changed: Moved logic for window and
+		applet into one class.
+
+2004-01-08 Rds <rds@rdsarts.com>
+
+	* Fixed: Options.xml fixed. ;) Widget layout also
+		cleaned up. Should work much better when using
+		text-under-graph mode.
+
+2004-01-07 Rds <rds@rdsarts.com>
+
+	* Fixed: Logic in lifetime display code.
+	* Fixed: Fonts. They now look spiffy. :)
+		Still need to fix the Options.xml file, though.
+
+2004-01-03 Rds <rds@rdsarts.com>
+
+	* Added: Options for displaying text/bar. Now, instead of
+		one hard to figure out line, it's 4. ;)
+	* BROKE: font handling of text. This is broke until I get
+		the new style code in. =\
+
+2003-12-15 Rds <rds@rdsarts.com>
+
+	* fixed: Changed labels in Options.xml to reflect
+		how time-till-update works now.
+
+
+changes from 0.5.0 to 0.5.1:
+
+2003-12-14 Tilo Riemer <riemer@lincvs.org>
+
+	* adapted for acpi.py 0.3.0
+	Baroque needs at least acpi.py 0.3.0 now because
+	a changed return type of estimated_lifetime
+	
+2003-12-10 Rds <rds@rdsarts.com>
+
+	* fixed: ACPI freeze when going from charging from
+		battery-powered.
+	* cleaned up some logic
+	* option change: time-till-update now works off
+		tenths of a second instead of milliseconds
+
+
+changes from merge of BatMonitor and Baroque to 0.5.0:
+
+2003-12-06 Tilo Riemer <riemer@lincvs.org>
+
+	* fixed: crash if apm is used
+
+
+changes of BatMonitor before merging with Baroque:
+
+2003-11-27 Rds <rds@rdsarts.com>
+
+	* added: some comments, cleaned up some things. 
+	Fixed the 'full battery freeze.'
+
+2003-11-26 Rds <rds@rdsarts.com>
+
+	* REALLY fixed dialog:
+	Fixed error-out dialog... I think.
+	Various spelling fixes in Options.xml
+
+2003-11-25 Rds <rds@rdsarts.com>
+
+	* fixed: warning dialog.
+
+2003-11-24 Rds <rds@rdsarts.com>
+
+	Changelog of BatMonitor started. ;)
+
+
+changes from 0.4.0 to 0.4.1:
+
+2003-09-08 Tilo Riemer <riemer@lincvs.org>
+
+	* changed: default check intervall is now 10 seconds
+	(instead of 20 seconds)
+
+2003-08-19 Tilo Riemer <riemer@lincvs.org>
+
+	* changed: catch exception from acpi.py (configuration- 
+	changed exception)
+
+	
+changes from 0.3.1 to 0.4.0:
+	
+2003-06-03 Tilo Riemer <riemer@lincvs.org>
+
+	* fixed: wrong formatting of minutes (apm only)
+	
+2003-05-29 Tilo Riemer <riemer@lincvs.org>
+
+	* changed: Baroque uses now acpi.py and apm.py.
+	In this way Baroque runs on all platforms which 
+	are supported by apm.py or acpi.py.
+
+
+changes from 0.3.0 to 0.3.1:
+
+2002-12-15 Tilo Riemer <riemer@lincvs.org>
+
+	* fix: show warning box (only apm systems were affected)
+	
+
+changes from 0.2.0 to 0.3.0:
+
+2002-12-08 Tilo Riemer <riemer@lincvs.org>
+
+	* Linux: support for ACPI added 
+	* nonblocking warning boxes
+	* completely rewritten
+
+
+changes from 0.1.0 to 0.2.0:
+
+2002-11-19 Tilo Riemer <riemer@lincvs.org>
+
+	* FreeBSD: support for more than one battery added 
+
+2002-11-15 Tilo Riemer <riemer@lincvs.org>
+
+	* add: support for Linux
+	* add: show warning if battery capacity is less than warn level

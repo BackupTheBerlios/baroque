@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+
+##############################################################################
+##
+## $Id: AppletRun,v 1.1 2004/07/11 02:38:19 rdsarts Exp $
+##
+## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
+##                         Tilo Riemer <riemer@lincvs.org>
+## All rights reserved.
+##
+## Baroque is a merge of BatMonitor and the old Baroque
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions
+## are met:
+##
+## 1. Redistributions of source code must retain the above copyright
+##    notice, this list of conditions and the following disclaimer.
+## 2. Redistributions in binary form must reproduce the above copyright
+##    notice, this list of conditions and the following disclaimer in the
+##    documentation and/or other materials provided with the distribution.
+## 3. The name of the author may not be used to endorse or promote products
+##    derived from this software without specific prior written permission.
+##
+## THIS SOFTWARE IS PROVIDED BY THE AUTHOR `AS IS'' AND ANY EXPRESS OR
+## IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+## OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+## IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+## INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+## NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+## THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+##
+###############################################################################
+
+
+import findrox; findrox.version(1, 9, 8)
+import rox
+from rox import g, applet, Menu
+from rox.options import Option
+import sys
+
+
+rox.setup_app_options('Baroque')
+
+import baroque
+
+rox.app_options.notify()
+Menu.set_save_name('Baroque')
+menu = Menu.Menu( 'main', [
+				# ('/Baroque',	'',				''),
+				('/Options',	'show_options',		''),
+				('/Quit',		'quit',			''),
+				])
+
+class baroque_window(applet.Applet, rox.Window):
+	def __init__(self, as_applet = True):
+		def update_tooltip():
+			box.tooltip.set_tip(self, 'Charge: ' + box.percent() + '%')
+			return 1
+
+		if as_applet:
+			applet.Applet.__init__(self, sys.argv[1])
+		else:
+			rox.Window.__init__(self)
+			
+		box = baroque.boxes()
+		self.add(box)
+		self.add_events(g.gdk.BUTTON_PRESS_MASK)
+		self.connect('button-press-event', self.button_press)
+		
+		menu.attach(self, self)
+		g.timeout_add(5000, update_tooltip)
+		update_tooltip()
+
+		
+	def button_press(self, window, event):
+		if event.button == 3:
+			menu.popup(self, event)
+			
+	def quit(self):
+		# Night, night.
+		self.destroy()
+	
+	def show_options(self):
+		rox.edit_options()
+		
+# This is a really tricky way to pass true or false based on the size of argv.
+main = baroque_window( (len(sys.argv) > 1) )
+
+main.show()
+rox.mainloop()

@@ -1,0 +1,3 @@
+Depricate option 'Applet height' by using proper font-size changes.
+
+Clean up the power management stuffs. This should NOT be getting taken care of in the boxes class, but rather in some wrapper for the battery API loading.

@@ -1,0 +1,69 @@
+<?xml version='1.0'?>
+<options>
+	<section title='First section'>
+		<frame label='Battery Options'>
+    
+			<toggle name='warn' label='Display a warning when Battery is low?'>
+			      When you want to have the applet display a box when the battery has reached a certain percentage, select this.
+			</toggle>
+    
+			<numentry name='warn_level' label='Percentage to warn at:' min='0' max='100' step='1'>
+			    	Set the percentage at which a warning will be displayed, if desired. At around 10%, your battery will be reaching it's last legs, and at 5% it's officially time to find a wall-outlet.
+			</numentry>
+			<hbox>
+				<numentry name='ticks_till_update' label='Tenths of a second to wait between updates:' min='0' max='100' step='10'>
+				This determines, in tenths of a second, how long to wait between updates.
+				</numentry>
+			</hbox>
+		</frame>
+
+		<frame label="Applet-Specific Options">
+			<hbox>
+				<vbox>
+					<frame label='Make applet'>
+<!--	Removed 2004/01/06 - unneeded. :) - Rds
+					<hbox>
+						<numentry name='applet_height' label='' min='10' max='100' step='1'>
+							How tall should the applet appear upon the panel? This changes the horizontal size of your applet, and if you are using a vertical panel it shall expand to keep it within boundaries.
+						</numentry>
+						<label> Tall</label>
+					</hbox>
+-->
+						<hbox>
+							<numentry name='applet_width' label='' min='10' max='100' step='1'>
+								In the early 1800s, applets were fattened for their rich, meaty taste and pleasing texture. Today, they grow solely to be more visible on your panel. This value determines how wide your applet appears, and if used on vertical panels, they will widen to accommodate if it not already wide enough.
+							</numentry>
+							<label> Wide</label>
+						</hbox>
+					</frame>
+					<spacer/>
+					<frame label='What font should text use?'>
+						<font name="text_font">
+							Sets the font of text when it's alone, or under the progress bar. This changes nothing if it is no visable, or inside the progress bar.
+						</font>
+					</frame>
+				</vbox>
+<!--			</frame> -->
+				<spacer/>
+				<vbox>
+					<frame label='Show battery information as:'>
+					<radio-group name='LABEL_IN_BAR' >
+						<radio value='text-only' label='Text only'>
+							Only display the text. No progress bar, no graphics, no fun. ;)
+						</radio>
+						<radio value='progress-under' label='Under progress bar'>
+							Displays the text under the progress bar.
+						</radio>
+						<radio value='progress-only' label='In progress bar'>
+							displays a progress bar, with any text being wrote inside the progress bar.
+						</radio>
+						<radio value='progress-notext' label='Progress bar only'>
+							Displays the progress bar only, with no text.
+						</radio>
+					</radio-group>
+					</frame>
+				</vbox>
+			</hbox>
+		</frame>
+	</section>
+</options>
