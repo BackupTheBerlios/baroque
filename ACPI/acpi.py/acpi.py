@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.12 2003/08/18 09:08:57 riemer Exp $
+## $Id: acpi.py,v 1.13 2003/08/18 18:29:13 sorgue Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -162,9 +162,10 @@ class AcpiLinux:
 		"""init ACPI class and check for any ACPI features in /proc/acpi/"""
 
 		self.init_batteries()
-		#self.init_fans()
-		#self.init_processors()
-
+		self.init_fans()
+		self.init_processors()
+		self.init_temperatures()
+		
 		self.update()
 
 
@@ -172,9 +173,9 @@ class AcpiLinux:
 		"""Read current states of supported acpi components"""
 
 		self.update_batteries()
-		#self.update_fans()
-		#self.update_processors()
-
+		self.update_fans()
+		self.update_processors()
+		self.update_temperatures()
 
         #battery related functions
 	def init_batteries(self):
@@ -204,8 +205,9 @@ class AcpiLinux:
 				if stat.S_ISDIR(mode):
 					self.battery_dir_entries.append(i)
 		except OSError:
-			raise AcpiError, ERR_GENERIC
-		
+			# the battery module is not correctly loaded, or is broken.
+			# currently self.battery_dir_entries has no batteries.		
+			return
 		
 		self.ac_line_state = OFFLINE
 
@@ -218,11 +220,11 @@ class AcpiLinux:
 					if line.find("last full capacity:") == 0:
 						cap = line.split(":")[1].strip()
 						self.design_capacity[i] = int(cap.split("mWh")[0].strip())					
-						line = info_file.readline()
-					info_file.close()
+					line = info_file.readline()
+				info_file.close()
 		except IOError:
-			# generic error or reconfigure? (if just in this moment the battery driver is unloaded)
-			raise AcpiError, ERR_GENERIC
+			# the battery module is not correctly loaded... the file info should exist.
+			self.battery_dir_entries = []
 
 
 
@@ -261,9 +263,12 @@ class AcpiLinux:
 						self.present_rate[i] = pr_rate
 
 					line = state_file.readline()
-					state_file.close()
+				state_file.close()
 		except IOError:
-			raise AcpiError, ERR_CONFIGURATION_CHANGED
+			#raise AcpiError, ERR_CONFIGURATION_CHANGED 
+			# maybe we should restart init_batteries instead of generating an error ?
+			# the user may have unplugged the battery.
+			init_batteries()
 
 
 	def init_temperatures(self):
@@ -294,7 +299,7 @@ class AcpiLinux:
 				if line.find("temperature") == 0:
 					self.temperatures[i] = line.split(":")[1].strip()
 				line = file.readline()
-
+			file.close()
 			
 	def init_fans(self):
 		"""Initialize fans"""
@@ -323,8 +328,8 @@ class AcpiLinux:
 						self.fans[i] = FAN_ON
 					else:
 						self.fans[i] = FAN_OFF
-					line = file.readline()
-
+				line = file.readline()
+			file.close()
 
 	def init_processors(self):
 		"""Initialize processors"""
@@ -412,7 +417,7 @@ class AcpiLinux:
 
 
 	def temperature(self):
-		return self.temp
+		return self.temperatures
 
 
 	def fan_state(self):

@@ -13,10 +13,10 @@ print "nb batteries : " + str(myAcpi.nb_of_batteries())
 print "charge: " + str(myAcpi.capacity())
 print "percent: " + str(myAcpi.percent())
 print "lifetime: " + myAcpi.estimated_lifetime()
-print "temperature: "+ myAcpi.temperature()
+print "temperature: "+ str(myAcpi.temperature())
 print "Frequency: "+ myAcpi.frequency()
 print "Available freqencies: "+str(myAcpi.performance_states())
 
 print "Change to "+myAcpi.performance_states()[1]
-print "result: "+ str(myAcpi.setFrequency(myAcpi.performance_states()[1]))
+print "result: "+ str(myAcpi.set_frequency(myAcpi.performance_states()[1]))
 
