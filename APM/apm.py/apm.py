@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: apm.py,v 1.3 2003/08/18 09:08:36 riemer Exp $
+## $Id: apm.py,v 1.4 2003/08/19 18:34:02 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -36,6 +36,8 @@ import sys
 
 
 #enums
+VERSION     = "0.3.1"
+
 OFFLINE     =  0
 ONLINE      =  1
 CHARGING    =  2   #implies ONLINE
@@ -111,6 +113,18 @@ class Apm:
 			raise ApmNotImplemented
 		
 
+	def identity(self):
+		"""Returns the identity of this module"""
+		return "apm.py"
+
+	def version(self):
+		"""Returns the version of this module"""
+		return VERSION
+
+	def version_low_level(self):
+		"""Returns the version of the apm_low_level module or none if no low level module ist used"""
+		return self.apm.version_low_level()
+	
 	def update(self):
 		"""Updates the APM state"""
 		self.apm.update()
@@ -145,6 +159,10 @@ class ApmBase:
 
 		#initial reading of apm info
 		self.update()
+
+	def version_low_level(self):
+		"""Returns the version of the apm_low_level module or none if no low level module ist used"""
+		return "none"
 	
 	def percent(self):
 		#returns percentage capacity of all batteries
@@ -184,6 +202,9 @@ class ApmGeneric(ApmBase):
 		#initial reading of apm info
 		self.update()
 
+	def version_low_level(self):
+		"""Returns the version of the apm_low_level module or none if no low level module ist used"""
+		return self.apm_lowlevel.version()
 	
 	def update(self):
 		apm_info = self.apm_lowlevel.state()

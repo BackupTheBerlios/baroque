@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.14 2003/08/18 18:56:37 sorgue Exp $
+## $Id: acpi.py,v 1.15 2003/08/19 18:35:04 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -37,6 +37,9 @@ import os,stat,sys
 # genenal constants ###########################################################
 
 #enums
+
+VERSION      = "0.2.0"
+
 OFFLINE      =  0
 ONLINE       =  1
 CHARGING     =  2   #implies ONLINE
@@ -107,6 +110,14 @@ class Acpi:
 			raise AcpiError, ERR_NOT_IMPLEMENTED
 		
 
+	def identity(self):
+		"""Returns the identity of this module"""
+		return "acpi.py"
+		
+	def version(self):
+		"""Returns the version of this module"""
+		return VERSION
+		
 	def update(self):
 		"""Updates the ACPI state"""
 		self.acpi.update()

@@ -1,5 +1,9 @@
 changes from 0.3.0 to 0.4.0:
 
+2003-08-19 Tilo Riemer <riemer@lincvs.org>
+
+	* added: identity and version functions
+	
 2003-08-18 Tilo Riemer <riemer@lincvs.org>
 
 	* fixed (Linux): some systems (for instance MDK 9.1) are 
