@@ -1,0 +1,9 @@
+* To sort this list by version-targets
+* ACPI using the Linux 2.6 /sys information
+* APM battery reading on OpenBSD, FreeBSD and NetBSD (convert from APM.py code)
+* ACPI battery reading on FreeBSD
+* ACPI battery reading on NetBSD (after 2.0 release)
+* Full API documentation
+* Thermalzone read support on FreeBSD and Linux
+* Scaling read support on FreeBSD and Linux
+* Scaling change support on FreeBSD and Linux
