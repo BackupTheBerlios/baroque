@@ -50,7 +50,7 @@
 						<radio value='progress-under' label='Under progress bar'>
 							Displays the text under the progress bar.
 						</radio>
-						<radio value='progress-only' label='Progress bar with text'>
+						<radio value='progress-only' label='In progress bar'>
 							displays a progress bar, with any text being wrote inside the progress bar.
 						</radio>
 						<radio value='progress-notext' label='Progress bar only'>

@@ -1,6 +1,6 @@
 ############################################################################
 ##
-## $Id: baroque.py,v 1.9 2004/01/03 18:08:16 rds Exp $
+## $Id: baroque.py,v 1.10 2004/01/07 06:54:11 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -155,6 +155,7 @@ class boxes(g.VBox):
 			txt = 'Charging'
 		else:
 			# Discharing from the battery
+			# TODO: This reports 'Battery' if we start it without a battery. This is a no-no?
 			if self.msg == 1:
 				self.msg = 0
 				txt = 'Battery'
@@ -166,12 +167,12 @@ class boxes(g.VBox):
 					temp2 = temp2 - (temp * 60)
 					txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
 				else:
-					try:
-						temp = battery.estimated_lifetime()
+					# try:
+						temp = float(battery.estimated_lifetime())
 						temp2 = int(60 * (temp - int(temp)))
 						txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
-					except ValueError:
-						txt = 'Charging'
+					# except ValueError:
+					#	txt = 'Charging'
 
 #		if (self.LABEL_IN_BAR.value) == 'True':
 #			self.percent_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value)
