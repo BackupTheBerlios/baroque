@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.18 2003/10/26 00:09:52 riemer Exp $
+## $Id: acpi.py,v 1.19 2003/10/26 00:18:41 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -486,7 +486,7 @@ class AcpiLinux:
 	def nb_of_batteries(self):
 		#returns the number of batteries
 		#if it returns 0, maybe ACPI is not available or 
-		#battery driver is not load
+		#battery driver is not loaded
 		return len(self.battery_dir_entries)
 
 		
