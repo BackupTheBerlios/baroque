@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: bq_apm.py,v 1.1 2002/12/09 22:43:55 riemer Exp $
+## $Id: bq_apm.py,v 1.2 2002/12/15 22:53:02 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -59,7 +59,7 @@ class CApm:
 		for i in lines:
 			if not percent_sum_found and (i.find("battery life") > 0):
 				percent_sum_found = 1
-				self.life_percent = i.split(":")[1].split("%")[0].strip()
+				self.life_percent = int(i.split(":")[1].split("%")[0].strip())
 				
 			if not time_sum_found and (i.find("battery time") > 0):
 				time_sum_found = 1

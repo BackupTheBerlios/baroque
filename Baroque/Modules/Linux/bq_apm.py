@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: bq_apm.py,v 1.2 2002/12/09 22:43:55 riemer Exp $
+## $Id: bq_apm.py,v 1.3 2002/12/15 22:53:02 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -72,7 +72,7 @@ class CApm:
 	
 		for i in items:
 			if i.find("%") > 0:
-				self.life_percent = i.split("%")[0].strip()
+				self.life_percent = int(i.split("%")[0].strip())
 		
 			if (i.find("(") > -1) and (i.find(":") > 0) and (i.find(")") > 0):
 				self.life_time_string = i.split("(")[1].split(")")[0].strip()

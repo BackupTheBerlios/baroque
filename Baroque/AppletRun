@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.13 2002/12/09 22:43:54 riemer Exp $
+## $Id: AppletRun,v 1.14 2002/12/15 22:50:10 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -42,7 +42,7 @@ import time, string, os
 
 
 #intervall which is used for calling apm... (milliseconds)
-CHECK_INTERVALL = 10000
+CHECK_INTERVALL = 30000
 
 #which operating system?
 FreeBSD = 1
@@ -74,13 +74,13 @@ def update_display(battery):
 	apm_display.set_text(txt)
 
 	if battery.charging_state() == bq_consts.OFFLINE:
-		if (percent <= cur_warn_level):
+		if percent <= cur_warn_level:
 			cur_warn_level = percent
 			os.system(app_dir + "/alert.py " + str(cur_warn_level) + "&")
 			cur_warn_level = cur_warn_level * 2 / 3	 #decrease warn level
 	else:
 		cur_warn_level = cur_default_warn_level
-		
+	
 	return 1
 	
 
