@@ -1,0 +1,7 @@
+Baroque is an applet for the ROX Desktop. It shows the battery state of APM
+and ACPI systems.
+
+Baroque is written in pure Python, compiling is not needed.
+Since version 0.4.0 Baroque is based on apm.py and acpi.py. It should run on
+all systems which are supported by apm.py and/or acpi.py and where ROX is
+installed.
