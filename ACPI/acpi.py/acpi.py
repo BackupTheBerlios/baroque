@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.19 2003/10/26 00:18:41 riemer Exp $
+## $Id: acpi.py,v 1.20 2003/12/14 15:24:43 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -137,7 +137,7 @@ class Acpi:
 		return self.acpi.charging_state()
 	
 	def estimated_lifetime(self):
-		"""Returns Estimated Lifetime"""
+		"""Returns Estimated Lifetime as real number"""
 		return self.acpi.estimated_lifetime()
 
 	def temperature(self, idx):
@@ -172,7 +172,7 @@ class AcpiLinux:
 
 		#we read all acpi stuff from here
 		self.proc_acpi_dir = "/proc/acpi"
-		#self.proc_acpi_dir = "/home/riemer/test/proc-rob/acpi"
+		#self.proc_acpi_dir = "/home/riemer/main/ACPI/proc/acpi"
 		
 		self.init_batteries()
 		self.init_fans()
@@ -502,10 +502,9 @@ class AcpiLinux:
 		# The user can check for ac-state before call this func
 		time = 0
 		for batt,life_capacity in self.life_capacity.items():
-			if self.present_rate[batt] == 0:
-				return "charging"
-			time = time + life_capacity/self.present_rate[batt]
-		return str(time)
+			if self.present_rate[batt] > 0:
+				time = time + life_capacity/self.present_rate[batt]
+		return time
 
 
 	# we need funcs like max_temperature and average_temperature

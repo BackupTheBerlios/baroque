@@ -1,3 +1,14 @@
+changes from 0.2.0 to 0.3.0:
+
+2003-12-14 Tilo Riemer <riemer@lincvs.org>
+	
+	* fixed: estimated_lifetime returns always
+	a real number now instead of strings like
+	charging.
+	NOTE: the return type has changed from
+	string to float
+
+	
 changes from 0.1.0 to 0.2.0:
 
 2003-10-26 Tilo Riemer <riemer@lincvs.org>
