@@ -1,6 +1,6 @@
-##############################################################################
+############################################################################
 ##
-## $Id: baroque.py,v 1.4 2003/12/06 16:57:22 riemer Exp $
+## $Id: baroque.py,v 1.5 2003/12/09 15:27:21 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -161,13 +161,13 @@ class boxes(g.VBox):
 				temp2 = temp2 - (temp * 60)
 				txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
 			else:
-
-				if battery.charging_state() == False:
+				try:
 					temp = float(battery.estimated_lifetime())
 					temp2 = int(60 * (temp - int(temp)))
 					txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
-				else:
+				except ValueError:
 					txt = 'AC Online'
+			if battery.charging_state() == 2: txt = 'Charging'
 			self.msg = 1
 
 		if (self.LABEL_IN_BAR.value) == "True":
