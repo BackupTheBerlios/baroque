@@ -6,7 +6,6 @@ import sys
 from rox import applet
 import time
 import commands
-import gtk
 
 
 time_display = g.Label("")
@@ -16,18 +15,18 @@ def update_time():
 	return 1
 
 apm_display = g.Label("")
-apm_display.set_justify(gtk.JUSTIFY_RIGHT)
+apm_display.set_justify(g.JUSTIFY_RIGHT)
 
 
 #doesn't work start
 map = apm_display.get_colormap()
 colour = map.alloc("red")
 style = apm_display.get_style().copy()
-style.bg[gtk.STATE_NORMAL] = colour
-style.bg[gtk.STATE_ACTIVE] = colour
-style.bg[gtk.STATE_INSENSITIVE] = colour
-style.bg[gtk.STATE_PRELIGHT] = colour
-style.bg[gtk.STATE_SELECTED] = colour
+style.bg[g.STATE_NORMAL] = colour
+style.bg[g.STATE_ACTIVE] = colour
+style.bg[g.STATE_INSENSITIVE] = colour
+style.bg[g.STATE_PRELIGHT] = colour
+style.bg[g.STATE_SELECTED] = colour
 apm_display.set_style(style)
 #doesn't work end
 
@@ -36,7 +35,8 @@ def update_apm():
 	life_percent = "0%"
 	life_time    = "00:00"
 	
-	res = commands.getoutput("apm")
+	#we reset LC_ALL because we need the english output from apm
+	res = commands.getoutput("env LC_ALL=C apm")
 	lines = res.split("\n")
 	for i in lines:
 		if i.find("battery life") > 0:
@@ -51,16 +51,18 @@ def update_apm():
 	return 1
 
 
-update_time()
+#update_time()
 update_apm()
 
 
-#main = rox.Window()
+if len(sys.argv) > 1:
+	if sys.argv[1] == "--no-applet":
+		main = rox.Window()
+	else:
+		main = applet.Applet(sys.argv[1])
+else:
+	main = rox.Window()
 
-#hier koennte man auf parameterzahl pruefen, wenn 0, dann als mainwin
-#starten, sonst als applet
-#und apprun als script, welches appletrun aufruft
-main = applet.Applet(sys.argv[1])
 
 main.set_border_width(8)
 main.add(apm_display)
