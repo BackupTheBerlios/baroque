@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.24 2003/12/15 20:10:10 riemer Exp $
+## $Id: acpi.py,v 1.25 2003/12/20 06:22:28 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>,
 ##                         Luc Sorgue  <luc.sorgue@laposte.net> and
@@ -132,6 +132,10 @@ class Acpi:
 	def nb_of_batteries(self):
 		"""Returns the number of batteries"""
 		return self.acpi.nb_of_batteries()
+	
+	def nb_of_fans(self):
+		"""Returns number of fans found as a integer"""
+		return self.acpi.nb_of_fans()
 
 	def charging_state(self):
 		"""Returns ac state (off-/online/charging)"""
@@ -471,12 +475,16 @@ class AcpiLinux:
 			life_capacity = life_capacity + c
 			design_capacity = design_capacity + self.design_capacity[i]
 
-		if design_capacity == 0:
-			return 0
+		# if design_capacity == 0:
+		# 	return 0
 		
 		# should we use try catch instead of the check above?
-		return (life_capacity * 100) / design_capacity
-
+		# return (life_capacity * 100) / design_capacity
+		try:
+			return (life_capacity * 100) / design_capacity
+		except ZeroDivisionError:
+			# We have a design capacity of 0.
+			return 0
 
 	def capacity(self):
 		"""Returns capacity of all batteries"""
@@ -492,6 +500,8 @@ class AcpiLinux:
 		#battery driver is not loaded
 		return len(self.battery_dir_entries)
 
+	def nb_of_fans(self):
+		return len(self.fan_dir_entries)
 		
 	def charging_state(self):
 		return self.ac_line_state
