@@ -1,5 +1,11 @@
 changes from 0.5.0 to 0.5.1:
 
+2003-12-14 Tilo Riemer <riemer@lincvs.org>
+
+	* adapted for acpi.py 0.3.0
+	Baroque needs at least acpi.py 0.3.0 now because
+	a changed return type of estimated_lifetime
+	
 2003-12-10 Rds <rds@rdsarts.com>
 
 	* fixed: ACPI freeze when going from charging from

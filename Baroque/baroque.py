@@ -1,6 +1,6 @@
 ############################################################################
 ##
-## $Id: baroque.py,v 1.7 2003/12/09 16:24:18 rds Exp $
+## $Id: baroque.py,v 1.8 2003/12/14 15:25:46 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -188,7 +188,7 @@ class boxes(g.VBox):
 					txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
 				else:
 					try:
-						temp = float(battery.estimated_lifetime())
+						temp = battery.estimated_lifetime()
 						temp2 = int(60 * (temp - int(temp)))
 						txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
 					except ValueError:
