@@ -1,6 +1,6 @@
 /****************************************************************************
 
- $Id: apm_lowlevel_funcs.c,v 1.1 2003/04/07 21:01:25 riemer Exp $
+ $Id: apm_lowlevel_funcs.c,v 1.2 2003/04/10 22:17:29 riemer Exp $
 
  Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
  All rights reserved. 
@@ -30,7 +30,19 @@
 
 ****************************************************************************/
 
+/* Just to be a bit more clear... */
+enum {
+  BATTERY_AC_OFF,      /* The computer is running off the battery. */
+  BATTERY_AC_ON,       /* Fully charged battery and computer running
+                          off AC power. */
+  BATTERY_CHARGING,    /* The computer is running off AC power but the
+                          battery isn't fully charged yet. */
+  BATTERY_NO_BATTERY   /* This is a desktop system or there is not a
+                          battery in the computer battery bay. */
+} battery_states;
 
+#define BATTERY_VALUE_UNKNOWN    -1 /* When the value is not known or it
+                                       simply does not matter. */
 
 #ifdef __FreeBSD__
 not implemented yet, but coming soon
@@ -91,6 +103,97 @@ int apm_state(int* p, int* t, int* ac) //return value == error code
 #ifdef __linux__
   //if we will use a low level modul anytime we have to include apm_bios.h
   //#include <linux/apm_bios.h>
+#endif
+
+/***************************************************************************/
+
+#if (defined __APPLE__) || (defined __DARWIN__)
+
+#include <stdio.h>
+#include <errno.h>
+#include <Carbon/Carbon.h>
+#include <IOKit/pwr_mgt/IOPMLib.h>
+#include <IOKit/pwr_mgt/IOPM.h>
+#include <IOKit/ps/IOPowerSources.h>
+#include <IOKit/ps/IOPSKeys.h>
+#include <mach/mach.h>
+
+int apm_state(int* p, int* t, int* ac) 
+{
+  mach_port_t master_port;
+  CFArrayRef battery_data;
+  CFTypeRef power_source;
+  CFDictionaryRef power_source_data;
+  int max_capacity;
+  int current_capacity;
+  int battery_flags;
+  IOReturn result;
+  kern_return_t err;
+
+  err = IOMasterPort(MACH_PORT_NULL, &master_port);
+  if (err != kIOReturnSuccess) return err;
+  battery_data = CFArrayCreateMutable(NULL, 0, &kCFTypeArrayCallBacks);
+  if (battery_data == NULL) return ENOMEM;
+  *t = BATTERY_VALUE_UNKNOWN;
+  *p = BATTERY_VALUE_UNKNOWN;
+  *ac = BATTERY_NO_BATTERY;
+  result = IOPMCopyBatteryInfo(master_port, &battery_data);
+  if (result != kIOReturnSuccess) {
+    /* No battery present */
+    CFRelease(battery_data);
+    return 0;
+  }
+  CFNumberGetValue(CFDictionaryGetValue(CFArrayGetValueAtIndex(
+    (CFArrayRef)battery_data, 0), CFSTR("Flags")), kCFNumberSInt32Type,
+    &battery_flags);
+  CFNumberGetValue(CFDictionaryGetValue(CFArrayGetValueAtIndex(
+    (CFArrayRef)battery_data, 0), CFSTR("Current")), kCFNumberSInt32Type,
+    &current_capacity);
+  CFNumberGetValue(CFDictionaryGetValue(CFArrayGetValueAtIndex(
+    (CFArrayRef)battery_data, 0), CFSTR("Capacity")), kCFNumberSInt32Type,
+    &max_capacity);
+  if (!(battery_flags & kIOPMBatteryInstalled)) {
+    /* No battery present */
+    CFRelease(battery_data);
+    return 0;
+  }
+  CFRelease(battery_data);
+  /* 
+   * At this point we're pretty sure this is a battery powered device,
+   * but there might be more than a single power source. My iBook only
+   * has only one of those and I haven't got anything else to test this
+   * code on.
+   *
+   * Another issue is that Mac OS X (v10.2.4 at least) returns -1 for
+   * the various timing/percentage values until it has calculated how
+   * much battery left to use / charge.
+   */
+  power_source = IOPSCopyPowerSourcesInfo();
+  power_source_data = IOPSGetPowerSourceDescription(power_source,
+    CFArrayGetValueAtIndex(IOPSCopyPowerSourcesList(power_source), 0));
+  if (battery_flags & kIOPMBatteryCharging) {
+    *ac = BATTERY_CHARGING;
+    /*
+     * I don't know how the *BSD APM implementation works, but I assume the
+     * time value returned when the battery is charging means the time left
+     * for the battery to fully charged.
+     */
+    *p = (int)(100.0f * ((float)current_capacity / (float)max_capacity));
+    CFNumberGetValue(CFDictionaryGetValue(power_source_data,
+      CFSTR(kIOPSTimeToFullChargeKey)), kCFNumberSInt32Type, t);
+  } else if (battery_flags & kIOPMACInstalled) {
+    *p = 100;
+    *ac = BATTERY_AC_ON;
+  } else {
+    *ac = BATTERY_AC_OFF;
+    *p = (int)(100.0f * ((float)current_capacity / (float)max_capacity));
+    CFNumberGetValue(CFDictionaryGetValue(power_source_data,
+      CFSTR(kIOPSTimeToEmptyKey)), kCFNumberSInt32Type, t);
+  }
+  CFRelease(power_source);
+  return 0;
+}
+
 #endif
 
 /***************************************************************************/

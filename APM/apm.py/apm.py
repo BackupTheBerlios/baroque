@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: apm.py,v 1.1 2003/04/07 21:01:25 riemer Exp $
+## $Id: apm.py,v 1.2 2003/04/10 22:13:55 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -39,7 +39,9 @@ import sys
 OFFLINE     =  0
 ONLINE      =  1
 CHARGING    =  2   #implies ONLINE
+NOBATTERY   =  3
 
+UNKNOWN     = -1
 
 
 #exceptions
@@ -95,6 +97,9 @@ class Apm:
 		
 		elif res.find("linux2") > -1:
 			self.apm = ApmLinux()
+
+		elif res.find("darwin") > -1:
+			self.apm = ApmGeneric()  #defined in apm_lowlevel
 			
 		else:
 			self.apm = None #throw exception (os unknown)
