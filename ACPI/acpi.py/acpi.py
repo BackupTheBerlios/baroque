@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.16 2003/08/22 18:27:48 riemer Exp $
+## $Id: acpi.py,v 1.17 2003/08/25 12:09:39 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -144,23 +144,23 @@ class Acpi:
 
 
 #ab hier pro Lüfter/Processor etc.?
-	def temperature(self):
+	def temperature(self, idx):
 		"""Returns Processor Temperature"""
-		return self.acpi.temperature()
+		return self.acpi.temperature(idx)
 
-	def fan_state(self):
+	def fan_state(self, idx):
 		"""Returns fan states"""
-		return self.acpi.fan_state()
+		return self.acpi.fan_state(idx)
 
-	def frequency(self):
+	def frequency(self, idx):
 		""" Return  the frequency of the processor"""
-		return self.acpi.frequency()
+		return self.acpi.frequency(idx)
 
-	def performance_states(self):
+	def performance_states(self, idx):
 		""" Return a list of available frequencies for the proc """
-		return self.acpi.performance_states()
+		return self.acpi.performance_states(idx)
 
-	def set_frequency(self,f):
+	def set_frequency(self, f):
 		""" Set the processor frequency - Warning ! Needs root privileges to work """
 		return self.acpi.set_frequency(f)
 
@@ -510,10 +510,12 @@ class AcpiLinux:
 
 	# we need funcs like max_temperature and average_temperature
 	def temperature(self, idx):
+		#print self.temperatures
 		return self.temperatures[idx]
 
 
 	def fan_state(self, idx):
+		#print self.fans
 		return self.fans[idx]
 
 
@@ -522,11 +524,12 @@ class AcpiLinux:
 
 
 	def frequency(self, idx):
+		#print self.freq
 		return self.freq[idx]
 
 
 # TODO: adapt it for multiple CPUs
-	def set_frequency(self,f):
+	def set_frequency(self, f):
 	#I think we should throw exceptions if someone goes wrong here
 	
 		if self.perf_states.has_key(f):
