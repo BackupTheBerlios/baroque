@@ -1,3 +1,10 @@
+changes from merge of BatMonitor and Baroque to 0.5.0:
+
+2003-12-06 Tilo Riemer <riemer@lincvs.org>
+
+	* fixed: crash if apm is used
+
+
 changes of BatMonitor before merging with Baroque:
 
 2003-11-27 Rds <rds@rdsarts.com>

@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: baroque.py,v 1.3 2003/12/05 03:29:35 rds Exp $
+## $Id: baroque.py,v 1.4 2003/12/06 16:57:22 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -116,9 +116,9 @@ class boxes(g.VBox):
 		rox.app_options.add_notify(options_update)
 		
 		def destroyed(self):
-                        g.timeout_remove(self.update_timeout)
-                        rox.app_options.remove_notify(options_update)
-		
+			g.timeout_remove(self.update_timeout)
+			rox.app_options.remove_notify(options_update)
+
 		self.connect('destroy', destroyed)
 		self.pack_start(self.percent_display, 1, 1, 2)
 		self.pack_start(self.battery_display, 1, 1, 2)
@@ -144,6 +144,9 @@ class boxes(g.VBox):
 		percent=battery.percent()
 		self.percent_display.set_fraction(float(percent) / 100)
 
+		#should never happens
+		txt = "Unknown"
+		
 		if self.msg == 1:
 			if battery.charging_state() == 1:
 				txt = 'AC Online'
@@ -156,6 +159,7 @@ class boxes(g.VBox):
 				temp2 = battery.time()
 				temp = int(temp2 / 60)
 				temp2 = temp2 - (temp * 60)
+				txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
 			else:
 
 				if battery.charging_state() == False:
