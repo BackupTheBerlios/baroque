@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
-import acpi
-from acpi import *
+import power 
+from power import *
 
-myAcpi = Acpi()
+myAcpi = Power()
 myAcpi.update()
 
 
@@ -24,6 +24,8 @@ if myAcpi.nb_of_batteries() > 0:
 	print "lifetime: " + str(myAcpi.estimated_lifetime())
 else:
 	print "No batteries detected."
+
+print myAcpi.power.abilities
 
 print "TODO: Add number of thermal zones module."
 # print "# thermal zones: " + str(myAcpi.nb_of_temperatures())
