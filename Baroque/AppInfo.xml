@@ -1,11 +1,19 @@
 <?xml version="1.0"?>
 <AppInfo>
   <Summary>A battery state applet for the ROX desktop</Summary>
+  <Summary xml:lang="de">Ein Batteriestatus-Applet fuer den ROX-Desktop</Summary>
   <About>
     <Purpose>Battery state applet</Purpose>
-    <Version>0.3.1 (15-Dec-2002)</Version>
+    <Version>0.4.0 (15-Jun-2003)</Version>
     <Author>Tilo Riemer</Author>
     <License>BSD License</License>
-    <Homepage>http://www.lincvs.org</Homepage>
+    <Homepage>http://www.iapp.de/~riemer/projects/baroque</Homepage>
+  </About>
+  <About xml:lang="de">
+    <Purpose label="Zweck">Batteriestatus-Applet</Purpose>
+    <Version>0.4.0 (15. Juni 2003)</Version>
+    <Author label="Autor">Tilo Riemer</Author>
+    <License label="Lizenz">BSD License</License>
+    <Homepage>http://www.iapp.de/~riemer/projects/baroque</Homepage>
   </About>
 </AppInfo>
