@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: baroque.py,v 1.1 2003/12/01 13:45:35 riemer Exp $
+## $Id: baroque.py,v 1.2 2003/12/01 14:37:48 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -127,7 +127,17 @@ class boxes(g.VBox):
 
 	def update_display(self, battery):
 		"""Updates all the parts of our applet, and cleans it up if needed."""
-		battery.update()
+
+		if batt_type == 0:
+			try:
+				battery.update()
+			except AcpiError:
+				#TODO: handling of exception
+				pass
+		else:
+			battery.update()
+
+
 		percent=battery.percent()
 		self.percent_display.set_fraction(float(percent) / 100)
 
