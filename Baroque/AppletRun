@@ -7,6 +7,8 @@ from rox import applet
 import time
 import commands
 
+apm_cmd = "/usr/sbin/apm"
+
 
 time_display = g.Label("")
 
@@ -36,7 +38,7 @@ def update_apm():
 	life_time    = "00:00"
 	
 	#we reset LC_ALL because we need the english output from apm
-	res = commands.getoutput("env LC_ALL=C apm")
+	res = commands.getoutput("env LC_ALL=C " + apm_cmd)
 	lines = res.split("\n")
 	for i in lines:
 		if i.find("battery life") > 0:
