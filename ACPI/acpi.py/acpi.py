@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.13 2003/08/18 18:29:13 sorgue Exp $
+## $Id: acpi.py,v 1.14 2003/08/18 18:56:37 sorgue Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -225,7 +225,7 @@ class AcpiLinux:
 		except IOError:
 			# the battery module is not correctly loaded... the file info should exist.
 			self.battery_dir_entries = []
-
+			self.design_capacity = {}
 
 
 	def update_batteries(self):
@@ -288,18 +288,22 @@ class AcpiLinux:
 	def update_temperatures(self):
 		"""Read current temperatures"""
 		
-			
+					
 		# Update processor temperature
 #so natuerlich quatsch: da muss ja dann der dateiname drinnenstehen!!!
-		for i in  self.temperatures:
-			#here we should use try/except
-			file = open("/proc/acpi/thermal_zone/"+i+"/temperature")
-			line = file.readline()
-			while len(line) != 0:
-				if line.find("temperature") == 0:
-					self.temperatures[i] = line.split(":")[1].strip()
+
+		try:
+			for i in  self.temperatures:
+				#here we should use try/except
+				file = open("/proc/acpi/thermal_zone/"+i+"/temperature")
 				line = file.readline()
-			file.close()
+				while len(line) != 0:
+					if line.find("temperature") == 0:
+						self.temperatures[i] = line.split(":")[1].strip()
+					line = file.readline()
+				file.close()
+		except:
+			raise AcpiError,ERR_CONFIGURATION_CHANGED
 			
 	def init_fans(self):
 		"""Initialize fans"""
@@ -319,17 +323,20 @@ class AcpiLinux:
 	def update_fans(self):
 		"""Read current state of fans"""
 		
-		for i in os.listdir("/proc/acpi/fan"):
-			file = open("/proc/acpi/fan/"+i+"/state")
-			line = file.readline()
-                        while len(line) != 0:
-                                if line.find("status") == 0:
-					if line.split(":")[1].strip() == 'on':
-						self.fans[i] = FAN_ON
-					else:
-						self.fans[i] = FAN_OFF
+		try:
+			for i in os.listdir("/proc/acpi/fan"):
+				file = open("/proc/acpi/fan/"+i+"/state")
 				line = file.readline()
-			file.close()
+                	        while len(line) != 0:
+                	                if line.find("status") == 0:
+						if line.split(":")[1].strip() == 'on':
+							self.fans[i] = FAN_ON
+						else:
+							self.fans[i] = FAN_OFF
+					line = file.readline()
+				file.close()
+		except:
+			raise AcpiError,ERR_CONFIGURATION_CHANGED
 
 	def init_processors(self):
 		"""Initialize processors"""
@@ -363,15 +370,17 @@ class AcpiLinux:
 	def update_processors(self):
 		"""Read current state of processors"""
 
-		pr = os.listdir("/proc/acpi/processor")[0]
-		f = open("/proc/acpi/processor/"+pr+"/performance","r")
-		l = f.readline()
-		while(len(l)!=0):
-			if l.find("*") > -1:
-				self.freq = l.split(":")[1].strip().split(",")[0]
+		try:
+			pr = os.listdir("/proc/acpi/processor")[0]
+			f = open("/proc/acpi/processor/"+pr+"/performance","r")
 			l = f.readline()
-		f.close()
-
+			while(len(l)!=0):
+				if l.find("*") > -1:
+					self.freq = l.split(":")[1].strip().split(",")[0]
+				l = f.readline()
+			f.close()
+		except:
+			raise AcpiError,ERR_CONFIGURATION_CHANGED
 
 	def percent(self):
 		"""Returns percentage capacity of all batteries"""
@@ -449,3 +458,5 @@ class AcpiLinux:
 				
 			f.write(state)
 			f.close()
+		else:
+			raise AcpiError, ERR_NOT_ALLOWED
