@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.6 2003/08/05 07:32:53 riemer Exp $
+## $Id: acpi.py,v 1.7 2003/08/05 07:35:12 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -144,9 +144,9 @@ class Acpi:
 		""" Return a list of available frequencies for the proc """
 		return self.acpi.performance_states()
 
-	def setFrequency(self,f):
+	def set_frequency(self,f):
 		""" Set the processor frequency - Warning ! Needs root privileges to work """
-		return self.acpi.setFrequency(f)
+		return self.acpi.set_frequency(f)
 
 
 class AcpiLinux:
@@ -320,7 +320,7 @@ class AcpiLinux:
 	def frequency(self):
 		return self.freq
 
-	def setFrequency(self,f):
+	def set_frequency(self,f):
 	#I think we should throw exceptions if someone goes wrong here
 	
 		if self.perf_states.has_key(f):
