@@ -1,6 +1,6 @@
 ############################################################################
 ##
-## $Id: baroque.py,v 1.5 2003/12/09 15:27:21 rds Exp $
+## $Id: baroque.py,v 1.6 2003/12/09 16:11:30 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -147,28 +147,54 @@ class boxes(g.VBox):
 		#should never happens
 		txt = "Unknown"
 		
-		if self.msg == 1:
-			if battery.charging_state() == 1:
-				txt = 'AC Online'
-			elif battery.charging_state() == 2:
-				txt = 'Charging'
-			else: txt = 'Battery'
-			self.msg = 0
+#		if self.msg == 1:
+#			if battery.charging_state() == 1:
+#				txt = 'AC Online'
+#			elif battery.charging_state() == 2:
+#				txt = 'Charging'
+#			else: txt = 'Battery'
+#			self.msg = 0
+#		else:
+#			if batt_type == 1:
+#				temp2 = battery.time()
+#				temp = int(temp2 / 60)
+#				temp2 = temp2 - (temp * 60)
+#				txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
+#			else:
+#				try:
+#					temp = float(battery.estimated_lifetime())
+#					temp2 = int(60 * (temp - int(temp)))
+#					txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
+#				except ValueError:
+#					txt = 'AC Online'
+#			if battery.charging_state() == 2: txt = 'Charging'
+#			self.msg = 1
+
+		print battery.charging_state()
+
+		if battery.charging_state() == 1:
+			txt = 'AC Online'
+		elif battery.charging_state() == 2:
+			txt = 'Charging'
 		else:
-			if batt_type == 1:
-				temp2 = battery.time()
-				temp = int(temp2 / 60)
-				temp2 = temp2 - (temp * 60)
-				txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
+			# Discharing from the battery
+			if self.msg == 1:
+				self.msg = 0
+				txt = 'Battery'
 			else:
-				try:
-					temp = float(battery.estimated_lifetime())
-					temp2 = int(60 * (temp - int(temp)))
+				self.msg =1
+				if batt_type == 1:
+					temp2 = battery.time()
+					temp = int(temp2 / 60)
+					temp2 = temp2 - (temp * 60)
 					txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
-				except ValueError:
-					txt = 'AC Online'
-			if battery.charging_state() == 2: txt = 'Charging'
-			self.msg = 1
+				else:
+					try:
+						temp = float(battery.estimated_lifetime())
+						temp2 = int(60 * (temp - int(temp)))
+						txt = str(int(temp)) + 'hours,' + str(temp2) + 'mins'
+					except ValueError:
+						txt = 'Charging'
 
 		if (self.LABEL_IN_BAR.value) == "True":
 			self.percent_display.set_size_request(self.applet_width.int_value, self.applet_height.int_value)
