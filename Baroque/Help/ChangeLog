@@ -1,5 +1,10 @@
 changes from 0.5.1 to 0.6.0:
 
+2004-04-26
+
+	* Changed: Moved logic for window and
+		applet into one class.
+
 2004-01-08 Rds <rds@rdsarts.com>
 
 	* Fixed: Options.xml fixed. ;) Widget layout also

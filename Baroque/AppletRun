@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.21 2003/12/01 13:45:35 riemer Exp $
+## $Id: AppletRun,v 1.22 2004/04/26 20:07:35 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##                         Tilo Riemer <riemer@lincvs.org>
@@ -50,20 +50,22 @@ import baroque
 rox.app_options.notify()
 Menu.set_save_name('Baroque')
 menu = Menu.Menu( 'main', [
-				('/Baroque',	'',				''),
+				# ('/Baroque',	'',				''),
 				('/Options',	'show_options',		''),
 				('/Quit',		'quit',			''),
 				])
 
-# TODO: Move this into one class. Should not be two.
-class baroque_app(applet.Applet):
-	def __init__(self):
-
+class baroque_window(applet.Applet, rox.Window):
+	def __init__(self, as_applet = True):
 		def update_tooltip():
 			box.tooltip.set_tip(self, 'Charge: ' + box.percent() + '%')
 			return 1
-		
-		applet.Applet.__init__(self, sys.argv[1])
+
+		if as_applet:
+			applet.Applet.__init__(self, sys.argv[1])
+		else:
+			rox.Window.__init__(self)
+			
 		box = baroque.boxes()
 		self.add(box)
 		self.add_events(g.gdk.BUTTON_PRESS_MASK)
@@ -84,40 +86,9 @@ class baroque_app(applet.Applet):
 	
 	def show_options(self):
 		rox.edit_options()
-
-class baroque_win(rox.Window):
-	def __init__(self):
-
-		def update_tooltip():
-			box.tooltip.set_tip(self, 'Charge: ' + box.percent() + '%')
-			return 1
 		
-		rox.Window.__init__(self)
-		box = baroque.boxes()
-		self.add(box)
-		self.add_events(g.gdk.BUTTON_PRESS_MASK)
-		self.connect('button-press-event', self.button_press)
-		
-		menu.attach(self, self)
-		g.timeout_add(5000, update_tooltip)
-		update_tooltip()
-
-	def button_press(self, window, event):
-		if event.button == 3:
-			menu.popup(self, event)
-			
-	def quit(self):
-		# Night, night.
-		self.destroy()
-	
-	def show_options(self):
-		rox.edit_options()
-
-# App or window? CHOOSE NOW! *cue music*
-if len(sys.argv) > 1:
-	main = baroque_app()
-else:
-	main = baroque_win()
+# This is a really tricky way to pass true or false based on the size of argv.
+main = baroque_window( (len(sys.argv) > 1) )
 
 main.show()
 rox.mainloop()
