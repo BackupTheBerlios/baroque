@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.21 2003/12/14 16:14:04 riemer Exp $
+## $Id: acpi.py,v 1.22 2003/12/15 15:58:58 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -229,6 +229,7 @@ class AcpiLinux:
 #check info for present: no
 		try:
 			for i in self.battery_dir_entries:
+				print self.proc_battery_dir + "/" + i + "/info"
 				info_file = open(self.proc_battery_dir + "/" + i + "/info")
 				line = info_file.readline()
 			
@@ -236,7 +237,7 @@ class AcpiLinux:
 					if line.find("last full capacity:") == 0:
 						cap = line.split(":")[1].strip()
 						try:
-							self.design_capacity[i] = int(cap.split("mWh")[0].strip())
+							self.design_capacity[i] = int(cap.split("m")[0].strip())
 						except ValueError:
 							#no value --> conversion to int failed
 							self.design_capacity[i] = 0
@@ -244,6 +245,7 @@ class AcpiLinux:
 					line = info_file.readline()
 				info_file.close()
 		except IOError:
+			print "No batt info found."
 			# the battery module is not correctly loaded... the file info should exist.
 			# wipe out all lists --> no battery infos
 			self.battery_dir_entries = []
@@ -264,7 +266,7 @@ class AcpiLinux:
 					if line.find("remaining capacity") == 0:
 						cap = line.split(":")[1].strip()
 						try:
-							self.life_capacity[i] = int(cap.split("mWh")[0].strip())
+							self.life_capacity[i] = int(cap.split("m")[0].strip())
 						except ValueError:
 							self.life_capacity[i] = 0
 
@@ -292,7 +294,7 @@ class AcpiLinux:
 
 					if line.find("present rate:") == 0:
 						try:
-							pr_rate = float(line.split(":")[1].strip().split("mW")[0].strip())
+							pr_rate = float(line.split(":")[1].strip().split("m")[0].strip())
 						except ValueError:
 							pr_rate = 0
 							
@@ -509,8 +511,9 @@ class AcpiLinux:
 
 	# we need funcs like max_temperature and average_temperature
 	def temperature(self, idx):
-		#print self.temperatures
-		return self.temperatures[self.thermal_dir_entries[idx]]
+		print self.temperatures
+		print self.thermal_dir_entries[idx]
+		return self.temperatures(self.thermal_dir_entries(idx))
 
 
 	def fan_state(self, idx):
