@@ -1,6 +1,6 @@
 ############################################################################
 ##
-## $Id: baroque.py,v 1.12 2004/01/07 08:29:48 rds Exp $
+## $Id: baroque.py,v 1.13 2004/01/08 04:26:11 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -124,8 +124,8 @@ class boxes(g.VBox):
 
 		self.connect('destroy', destroyed)
 		# pack_start(widget, expand, fill, padding)
-		self.pack_start(self.percent_display, g.TRUE, g.TRUE, 2)
-		self.pack_start(self.battery_display, g.FALSE, g.FALSE, 2)
+		self.pack_start(self.percent_display, g.TRUE, g.TRUE, 0)
+		self.pack_start(self.battery_display, g.FALSE, g.FALSE, 0)
 		self.percent_display.set_size_request(-1,10)
 		self.set_size_request(self.applet_width.int_value, -1)
 		self.update_display(battery)

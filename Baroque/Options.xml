@@ -19,9 +19,9 @@
 
 		<frame label="Applet-Specific Options">
 			<hbox>
-			<frame label='Make applet'>
 				<vbox>
-<!--
+					<frame label='Make applet'>
+<!--	Removed 2004/01/06 - unneeded. :) - Rds
 					<hbox>
 						<numentry name='applet_height' label='' min='10' max='100' step='1'>
 							How tall should the applet appear upon the panel? This changes the horizontal size of your applet, and if you are using a vertical panel it shall expand to keep it within boundaries.
@@ -29,20 +29,21 @@
 						<label> Tall</label>
 					</hbox>
 -->
-					<hbox>
-						<numentry name='applet_width' label='' min='10' max='100' step='1'>
-							In the early 1800s, applets were fattened for their rich, meaty taste and pleasing texture. Today, they grow solely to be more visible on your panel. This value determines how wide your applet appears, and if used on vertical panels, they will widen to accommodate if it not already wide enough.
-						</numentry>
-						<label> Wide</label>
-					</hbox>
+						<hbox>
+							<numentry name='applet_width' label='' min='10' max='100' step='1'>
+								In the early 1800s, applets were fattened for their rich, meaty taste and pleasing texture. Today, they grow solely to be more visible on your panel. This value determines how wide your applet appears, and if used on vertical panels, they will widen to accommodate if it not already wide enough.
+							</numentry>
+							<label> Wide</label>
+						</hbox>
+					</frame>
 					<spacer/>
 					<frame label='What font should text use?'>
-					<font name="text_font">
-						Sets the text font size of text when it's alone, or under the progress bar. This changes nothing if it is no visable, or inside the progress bar.
-					</font>
+						<font name="text_font">
+							Sets the font of text when it's alone, or under the progress bar. This changes nothing if it is no visable, or inside the progress bar.
+						</font>
 					</frame>
 				</vbox>
-			</frame>
+<!--			</frame> -->
 				<spacer/>
 				<vbox>
 					<frame label='Show battery information as:'>
