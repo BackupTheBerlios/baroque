@@ -1,6 +1,6 @@
 ############################################################################
 ##
-## $Id: baroque.py,v 1.11 2004/01/07 08:05:52 rds Exp $
+## $Id: baroque.py,v 1.12 2004/01/07 08:29:48 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -88,9 +88,9 @@ class boxes(g.VBox):
 	warn = Option('warn', True)
 	warn_level = Option('warn_level', 10)
 	applet_width = Option('applet_width', 100)
-	applet_height = Option('applet_height', 20)
+	# applet_height = Option('applet_height', 20)
 	text_font = Option('text_font', 'Sans 12')
-	text_height = Option('text_height', 10)
+	# text_height = Option('text_height', 10)
 	ticks_till_update = Option('ticks_till_update', "1000")
 	LABEL_IN_BAR = Option('LABEL_IN_BAR', True)
 
@@ -123,8 +123,9 @@ class boxes(g.VBox):
 			rox.app_options.remove_notify(options_update)
 
 		self.connect('destroy', destroyed)
-		self.pack_start(self.percent_display, 1, 1, 2)
-		self.pack_start(self.battery_display, 1, 1, 2)
+		# pack_start(widget, expand, fill, padding)
+		self.pack_start(self.percent_display, g.TRUE, g.TRUE, 2)
+		self.pack_start(self.battery_display, g.FALSE, g.FALSE, 2)
 		self.percent_display.set_size_request(-1,10)
 		self.set_size_request(self.applet_width.int_value, -1)
 		self.update_display(battery)
