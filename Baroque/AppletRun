@@ -20,18 +20,6 @@ apm_display = g.Label("")
 apm_display.set_justify(g.JUSTIFY_RIGHT)
 
 
-#doesn't work start
-map = apm_display.get_colormap()
-colour = map.alloc("red")
-style = apm_display.get_style().copy()
-style.bg[g.STATE_NORMAL] = colour
-style.bg[g.STATE_ACTIVE] = colour
-style.bg[g.STATE_INSENSITIVE] = colour
-style.bg[g.STATE_PRELIGHT] = colour
-style.bg[g.STATE_SELECTED] = colour
-apm_display.set_style(style)
-#doesn't work end
-
 #das label kann mehrere zeilen darstellen, man koennte die zeit also auch anzeigen
 def update_apm():
 	life_percent = "0%"
@@ -58,10 +46,7 @@ update_apm()
 
 
 if len(sys.argv) > 1:
-	if sys.argv[1] == "--no-applet":
-		main = rox.Window()
-	else:
-		main = applet.Applet(sys.argv[1])
+	main = applet.Applet(sys.argv[1])
 else:
 	main = rox.Window()
 

@@ -3,4 +3,4 @@
 APP_DIR=`dirname $0`
 APP_DIR=`cd "$APP_DIR";pwd`
 
-exec "$APP_DIR/AppletRun --no-applet"
+exec "$APP_DIR/AppletRun"
