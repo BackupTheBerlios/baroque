@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.16 2003/06/02 05:21:13 riemer Exp $
+## $Id: AppletRun,v 1.17 2003/06/03 21:34:44 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -83,7 +83,7 @@ def update_display(battery):
 	else:
 		hours = battery.time() / 60
 		mins  = battery.time() % 60
-		cap_time_str = str(hours) + ":" + str(mins)
+		cap_time_str = str(hours) + ":%(mins)02d" % vars()
 		offline_state = apm.OFFLINE 
 
 	txt = percent_str + "\n" + cap_time_str
