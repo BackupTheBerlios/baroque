@@ -1,5 +1,13 @@
-changes from 0.3.1 to 0.4.0:
+changes from 0.4.0 to 0.4.1:
 
+2003-08-19 Tilo Riemer <riemer@lincvs.org>
+
+	* changed: catch exception from acpi.py (configuration 
+	changed)
+
+	
+changes from 0.3.1 to 0.4.0:
+	
 2003-06-03 Tilo Riemer <riemer@lincvs.org>
 
 	* fixed: wrong formatting of minutes (apm only)

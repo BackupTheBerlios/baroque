@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.17 2003/06/03 21:34:44 riemer Exp $
+## $Id: AppletRun,v 1.18 2003/08/19 18:27:14 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -71,9 +71,16 @@ def update_display(battery):
 	global app_dir
 	global type
 	global battery_display
-	
-	battery.update()
 
+	if type == TYPE_ACPI:
+		try:	
+			battery.update()
+		except AcpiError:
+			#TODO: handling of exception
+			pass
+	else:		
+		battery.update()
+			
 	percent = battery.percent()
 	percent_str = str(percent) + "%"
 
