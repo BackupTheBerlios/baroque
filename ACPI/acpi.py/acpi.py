@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.3 2003/07/01 13:03:33 sorgue Exp $
+## $Id: acpi.py,v 1.4 2003/07/01 23:43:54 sorgue Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -38,7 +38,8 @@ import os,stat,sys
 OFFLINE     =  0
 ONLINE      =  1
 CHARGING    =  2   #implies ONLINE
-
+OFF         =  0
+ON          =  1
 
 
 #exceptions
@@ -107,21 +108,17 @@ class Acpi:
 		"""Updates the ACPI state"""
 		self.acpi.update()
 
-	
 	def percent(self):
 		"""Returns percentage capacity of all batteries"""
 		return self.acpi.percent()
 
-		
 	def capacity(self):
 		"""Returns capacity of all batteries (in mWh)"""
 		return self.acpi.capacity()
 
-	
 	def nb_of_batteries(self):
 		"""Returns the number of batteries"""
 		return self.acpi.nb_of_batteries()
-
 
 	def charging_state(self):
 		"""Returns ac state (off-/online/charging)"""
@@ -131,6 +128,13 @@ class Acpi:
 		"""Returns Estimated Lifetime"""
 		return self.acpi.estimated_lifetime()
 
+	def temperature(self):
+		"""Returns Processor Temperature"""
+		return self.acpi.temperature()
+
+	def fan_state(self):
+		"""Returns fan states"""
+		return self.acpi.fan_state()
 
 
 class AcpiLinux:
@@ -152,6 +156,7 @@ class AcpiLinux:
 		self.design_capacity = {}
 		self.life_capacity = {}
 		self.present_rate = {}
+		self.fans = {}
 
 		#initial reading of acpi info
 		self.initialize()
@@ -171,7 +176,11 @@ class AcpiLinux:
 					self.design_capacity[i] = int(cap.split("mWh")[0].strip())					
 				line = info_file.readline()
 			info_file.close()
-			
+		# Read /proc/acpi/fan/*
+
+		for i in os.listdir("/proc/acpi/fan"):
+			self.fans[i] = "off"
+
 	def update(self):
 		"""Read /proc/acpi/battery/*/state and extract needed infos"""
 		
@@ -207,10 +216,23 @@ class AcpiLinux:
 
 				line = state_file.readline()
 			state_file.close()
-					
+		# Update processor temperature
+		for i in  os.listdir("/proc/acpi/thermal_zone"):
+			file = open("/proc/acpi/thermal_zone/"+i+"/temperature")
+			line = file.readline()
+			while len(line) != 0:
+				if line.find("temperature") == 0:
+					self.temp = line.split(":")[1].strip()
+				line = file.readline()
 
-					
-
+		# Update fan states
+		for i in os.listdir("/proc/acpi/fan"):
+			file = open("/proc/acpi/fan/"+i+"/state")
+			line = file.readline()
+                        while len(line) != 0:
+                                if line.find("status") == 0:
+                                        self.fans[i] = line.split(":")[1].strip()
+                                line = file.readline()
 
 	def percent(self):
 		"""Returns percentage capacity of all batteries"""
@@ -222,7 +244,6 @@ class AcpiLinux:
 		
 		return (life_capacity * 100) / design_capacity
 
-
 	def capacity(self):
 		"""Returns capacity of all batteries"""
 		capacity = 0
@@ -230,14 +251,12 @@ class AcpiLinux:
 			capacity = capacity + c
 		return capacity
 
-
 	def nb_of_batteries(self):
 		#returns the number of batteries
 		#if it returns 0, maybe ACPI is not available or 
 		#battery driver is not load
 		return len(self.life_capacity)
 		
-
 	def charging_state(self):
 		return self.ac_line_state
 
@@ -248,3 +267,9 @@ class AcpiLinux:
 				return "charging"
 			time = time + life_capacity/self.present_rate[batt]
 		return str(time)
+
+	def temperature(self):
+		return self.temp
+
+	def fan_state(self):
+		return self.fans
