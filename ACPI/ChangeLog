@@ -1,10 +1,13 @@
-changes from 0.2.0 to 0.3.0:
+changes from 0.3.0 to 0.4.0:
 
 Rds <rds@rdsarts.com>
 
 	* Added: nb_of_fans routine
 	* Changed: Made the percent() routine use try/except 
 	* Added: some complexity to test.py.
+
+	
+changes from 0.2.0 to 0.3.0:
 
 2003-12-15 Rds <rds@rdsarts.com>
 
