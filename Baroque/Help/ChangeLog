@@ -1,5 +1,11 @@
 changes from 0.5.1 to 0.6.0:
 
+2004-01-08 Rds <rds@rdsarts.com>
+
+	* Fixed: Options.xml fixed. ;) Widget layout also
+		cleaned up. Should work much better when using
+		text-under-graph mode.
+
 2004-01-07 Rds <rds@rdsarts.com>
 
 	* Fixed: Logic in lifetime display code.
