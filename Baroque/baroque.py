@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: baroque.py,v 1.2 2003/12/01 14:37:48 riemer Exp $
+## $Id: baroque.py,v 1.3 2003/12/05 03:29:35 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -54,7 +54,8 @@ except ImportError:
 		offline_state = apm.OFFLINE
 	except ImportError:
 		# No PM module loaded. We be screwed.
-		warning_dialog(title='Low Battery Warning', txt="Sorry, could not load apm.py or acpi.py.\nPlease download and install one from http://www.iapp.de/~riemer/projects", warn = 0)
+		# warning_dialog(title='Low Battery Warning', txt="Sorry, could not load apm.py or acpi.py.\nPlease download and install one from http://www.iapp.de/~riemer/projects", warn = 0)
+		rox.croak('Sorry, but we could not find or load apm.py or acpi.py. Please download and install either apm.py or acpi.py from http://www.iapp.de/~riemer/projects')
 
 def warning_dialog(txt='', warning = 1, title='Dialog'):
 	"""This displays a dialog box, with only a OK button, that contains txt as it's text, and title as it's title.
@@ -132,6 +133,8 @@ class boxes(g.VBox):
 			try:
 				battery.update()
 			except AcpiError:
+				# rem battery
+				# battery = acpi.Acpi()
 				#TODO: handling of exception
 				pass
 		else:
