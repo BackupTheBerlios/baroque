@@ -1,0 +1,7 @@
+changes from 0.1.0 to 0.2.0:
+
+2002-11-15 Tilo Riemer <riemer@lincvs.org>
+
+	* add: support for Linux
+	* add: show warning if battery capacity is less than warn level
+	

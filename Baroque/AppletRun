@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.6 2002/11/12 23:41:07 riemer Exp $
+## $Id: AppletRun,v 1.7 2002/11/15 23:35:28 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -41,26 +41,63 @@ from rox import applet
 import time
 import commands
 
-apm_cmd = "/usr/sbin/apm"
+
+#opens a message box if percentage battery capacity is less than WARN_LEVEL
+WARN_LEVEL = 10 #warn if less than 10%
+
+#intervall which is used for calling apm...
+CHECK_INTERVALL = 10000
 
 
-time_display = g.Label("")
+FreeBSD = 1
+system  = 0
 
-def update_time():
-	time_display.set_text(time.ctime())
-	return 1
-
-apm_display = g.Label("")
-apm_display.set_justify(g.JUSTIFY_RIGHT)
+apm_cmd_freebsd = "/usr/sbin/apm"
+apm_cmd_generic = "apm"
 
 
-#das label kann mehrere zeilen darstellen, man koennte die zeit also auch anzeigen
-def update_apm():
-	life_percent = "0%"
-	life_time    = "00:00"
+# alert state: 
+# 0 --> not showed
+# 1 --> show
+# 2 --> just closed
+alert_state = 0
+
+ONLINE  = 1
+OFFLINE = 0
+ac_line_state = ONLINE	# we assume the best
+
+
+cur_warn_level = WARN_LEVEL
+
+
+def check_capacity(cap):
+#check for capacity and opens a message box if capacity is too less
+#the code is a little bit obscure
+	global alert_state
+	global cur_warn_level
+
+	cap_val = int(cap.split("%")[0])
+
+	if alert_state == 0:
+		if (cap_val < cur_warn_level) and (ac_line_state == OFFLINE):
+			alert_state = 1
+			rox.alert('The capacity of battery is less than ' + cap)
+			alert_state = 2
+			cur_warn_level = cur_warn_level * 2 / 3	 #decrease warn level
+	elif alert_state == 2:
+		alert_state = 0
+			
+	g.timeout_add(CHECK_INTERVALL, update_apm)
+
+
+def update_apm_freebsd():
+	global ac_line_state
 	
+	life_percent = "0%"
+	life_time    = "00:00:00"
+
 	#we reset LC_ALL because we need the english output from apm
-	res = commands.getoutput("env LC_ALL=C " + apm_cmd)
+	res = commands.getoutput("env LC_ALL=C " + apm_cmd_freebsd)
 	lines = res.split("\n")
 	for i in lines:
 		if i.find("battery life") > 0:
@@ -70,27 +107,104 @@ def update_apm():
 		if i.find("battery time") > 0:
 			life_res = i.split(": ")
 			life_time = life_res[1]
-			
+
+		if i.find("off-line") > 0:
+			ac_line_state  = OFFLINE
+		elif i.find("on-line") > 0:
+			cur_warn_level = WARN_LEVEL
+			ac_line_state  = ONLINE
+
+
 	apm_display.set_text(life_percent + "\n" + life_time)
+	
+	check_capacity(life_percent)
+	
 	return 1
 
 
-#update_time()
-update_apm()
+
+def update_apm_linux():
+	global ac_line_state
+
+	life_percent = "0%"
+	life_time    = "00:00"
+
+	#we reset LC_ALL because we need the english output from apm
+	res = commands.getoutput("env LC_ALL=C " + apm_cmd_generic)
+	#res = "AC off-line, battery status high: 100% (3:20)\n"
+	
+	lines = res.split("\n")
+	
+	#we assume all info in the first (the one and only) line
+	if lines[0].find("off-line") > 0:
+		ac_line_state = OFFLINE
+	elif i.find("on-line") > 0:
+		cur_warn_level = WARN_LEVEL
+		ac_line_state = ONLINE
+		
+
+	#if lines[0].find("charging") > 0:
+		#print "charging"
+
+	items = lines[0].split()
+
+	for i in items:
+		if i.find("%") > 0:
+			life_percent = i
+	
+		if (i.find("(") > -1) and (i.find(":") > 0) and (i.find(")") > 0):
+			life_time = i.split("(")[1].split(")")[0]
+		
+	apm_display.set_text(life_percent + "\n" + life_time)
+	
+	check_capacity(life_percent)
+	
+	return 1
 
 
+
+def update_apm():
+#calls system dependent update funcs
+	if system == FreeBSD:
+		update_apm_freebsd()
+	else:
+		update_apm_linux()
+		
+
+def check_system():
+	res = sys.platform
+	if res.find("freebsd") > -1:
+		return FreeBSD
+	else:
+		return 0
+		
+
+
+#check run mode (applet or normal application?)
 if len(sys.argv) > 1:
 	main = applet.Applet(sys.argv[1])
 else:
 	main = rox.Window()
 
 
-main.set_border_width(8)
+#init display
+apm_display = g.Label("")
+apm_display.set_justify(g.JUSTIFY_RIGHT)
+
+
+
+#check system (FreeBSD or other)
+system = check_system()
+
+
+#initial update of apm state
+update_apm()
+
+main.set_border_width(6)
 main.add(apm_display)
 main.show_all()
 
-#g.timeout_add( 1000, update_time)
-g.timeout_add(10000, update_apm)
+g.timeout_add(CHECK_INTERVALL, update_apm)
 
 
 rox.mainloop()
