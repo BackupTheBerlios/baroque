@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+import findrox
+import rox
+from rox import g
+import sys
+from rox import applet
+import time
+import commands
+
+
+time_display = g.Label("")
+
+def update_time():
+	time_display.set_text(time.ctime())
+	return 1
+
+apm_display = g.Label("")
+
+#das label kann mehrere zeilen darstellen, man koennte die zeit also auch anzeigen
+def update_apm():
+	life_percent = "0%"
+	life_time    = "00:00"
+	
+	res = commands.getoutput("apm")
+	lines = res.split("\n")
+	for i in lines:
+		if i.find("battery life") > 0:
+			life_res = i.split(":")
+			life_percent = life_res[1]
+			
+		if i.find("battery time") > 0:
+			life_res = i.split(": ")
+			life_time = life_res[1]
+			
+	apm_display.set_text(life_percent + "\n" + life_time)
+	return 1
+
+
+update_time()
+update_apm()
+
+
+main = rox.Window()
+#main = applet.Applet(sys.argv[1])
+
+#main.add(time_display)
+main.add(apm_display)
+main.show_all()
+
+#g.timeout_add( 1000, update_time)
+g.timeout_add(10000, update_apm)
+
+
+rox.mainloop()
