@@ -6,6 +6,7 @@ import sys
 from rox import applet
 import time
 import commands
+import gtk
 
 
 time_display = g.Label("")
@@ -15,6 +16,20 @@ def update_time():
 	return 1
 
 apm_display = g.Label("")
+apm_display.set_justify(gtk.JUSTIFY_RIGHT)
+
+
+#doesn't work start
+map = apm_display.get_colormap()
+colour = map.alloc("red")
+style = apm_display.get_style().copy()
+style.bg[gtk.STATE_NORMAL] = colour
+style.bg[gtk.STATE_ACTIVE] = colour
+style.bg[gtk.STATE_INSENSITIVE] = colour
+style.bg[gtk.STATE_PRELIGHT] = colour
+style.bg[gtk.STATE_SELECTED] = colour
+apm_display.set_style(style)
+#doesn't work end
 
 #das label kann mehrere zeilen darstellen, man koennte die zeit also auch anzeigen
 def update_apm():
@@ -41,9 +56,13 @@ update_apm()
 
 
 #main = rox.Window()
+
+#hier koennte man auf parameterzahl pruefen, wenn 0, dann als mainwin
+#starten, sonst als applet
+#und apprun als script, welches appletrun aufruft
 main = applet.Applet(sys.argv[1])
 
-#main.add(time_display)
+main.set_border_width(8)
 main.add(apm_display)
 main.show_all()
 
