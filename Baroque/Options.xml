@@ -11,8 +11,8 @@
 			    	Set the percentage at which a warning will be displayed, if desired. At around 10%, your battery will be reaching it's last legs, and at 5% it's officially time to find a wall-outlet.
 			</numentry>
 			<hbox>
-				<numentry name='ticks_till_update' label='Time to wait between updates:' min='0' max='100000' step='1000'>
-					This determines, in milliseconds, how long to wait between updates.
+				<numentry name='ticks_till_update' label='Tenths of a second to wait between updates:' min='0' max='100' step='10'>
+				This determines, in tenths of a second, how long to wait between updates.
 				</numentry>
 				<label>milliseconds</label>
 			</hbox>

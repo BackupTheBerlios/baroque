@@ -1,6 +1,6 @@
 ############################################################################
 ##
-## $Id: baroque.py,v 1.6 2003/12/09 16:11:30 rds Exp $
+## $Id: baroque.py,v 1.7 2003/12/09 16:24:18 rds Exp $
 ##
 ## Copyright (C) 2002-2003 Rds <rds@rdsarts.com> and 
 ##              Tilo Riemer <riemer@lincvs.org>
@@ -105,13 +105,13 @@ class boxes(g.VBox):
 	def __init__(self):
 		g.VBox.__init__(self)
 		
-		
-		self.update_timeout = g.timeout_add(int(self.ticks_till_update.int_value), self.update_display, battery)
+		self.update_timeout = g.timeout_add(int(self.ticks_till_update.int_value) * 100, self.update_display, battery)
 		
 		def options_update():
 			g.timeout_remove(self.update_timeout)
 			self.update_display(battery)
-			self.update_timeout = g.timeout_add(int(self.ticks_till_update.int_value), self.update_display, battery)
+			# print str(int(self.ticks_till_update.int_value) * 100)
+			self.update_timeout = g.timeout_add(int(self.ticks_till_update.int_value) * 100, self.update_display, battery)
 
 		rox.app_options.add_notify(options_update)
 		
@@ -169,8 +169,6 @@ class boxes(g.VBox):
 #					txt = 'AC Online'
 #			if battery.charging_state() == 2: txt = 'Charging'
 #			self.msg = 1
-
-		print battery.charging_state()
 
 		if battery.charging_state() == 1:
 			txt = 'AC Online'
