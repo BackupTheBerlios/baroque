@@ -1,0 +1,10 @@
+changes from 0.1.0 to 0.2.0:
+
+2003-08-18 Tilo Riemer <riemer@lincvs.org>
+
+	* fixed (Linux): some systems (for instance MDK 9.1) are 
+	identified as linux instead of linux2; a workaround is 
+	added but it will not work for Linux < 2.x ;-)
+
+TO ADD:
+all the changes from Luc and so on
