@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.9 2002/11/19 23:43:11 riemer Exp $
+## $Id: AppletRun,v 1.10 2002/11/21 11:02:20 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -104,12 +104,12 @@ def update_apm_freebsd():
 	res = commands.getoutput("env LC_ALL=C " + apm_cmd_freebsd)
 	lines = res.split("\n")
 	for i in lines:
-		if (i.find("battery life") > 0) and not percent_sum_found:
+		if not percent_sum_found and (i.find("battery life") > 0):
 			percent_sum_found = 1
 			life_res = i.split(":")
 			life_percent = life_res[1]
 			
-		if (i.find("battery time") > 0) and not time_sum_found:
+		if not time_sum_found and (i.find("battery time") > 0):
 			time_sum_found = 1
 			life_res = i.split(": ")
 			life_res2 = life_res[1].split(":")
