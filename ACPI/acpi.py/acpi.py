@@ -1,6 +1,6 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.15 2003/08/19 18:35:04 riemer Exp $
+## $Id: acpi.py,v 1.16 2003/08/22 18:27:48 riemer Exp $
 ##
 ## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
 ##                     and Luc Sorgue  <luc.sorgue@laposte.net>
@@ -172,9 +172,13 @@ class AcpiLinux:
 	def __init__(self):
 		"""init ACPI class and check for any ACPI features in /proc/acpi/"""
 
+		#we read all acpi stuff from here
+		self.proc_acpi_dir = "/proc/acpi"
+		#self.proc_acpi_dir = "/home/riemer/proc/acpi"
+		
 		self.init_batteries()
 		self.init_fans()
-		self.init_processors()
+		#self.init_processors()
 		self.init_temperatures()
 		
 		self.update()
@@ -185,22 +189,21 @@ class AcpiLinux:
 
 		self.update_batteries()
 		self.update_fans()
-		self.update_processors()
+		#self.update_processors()
 		self.update_temperatures()
 
-        #battery related functions
+        # battery related functions
 	def init_batteries(self):
 		"""Checks for and initializes the batteries"""
 
-		self.proc_battery_dir = "/proc/acpi/battery"
-		#self.proc_battery_dir = "/home/riemer/fix/Baroque/acpi/battery"
+		self.proc_battery_dir = self.proc_acpi_dir + "/battery"
 
-                #empty lists implies no battery, no capacity etc.
+                # empty lists implies no battery, no capacity etc.
 		self.design_capacity = {}
 		self.life_capacity = {}
 		self.present_rate = {}
 
-		#empty list of battery sub directories; implies no batteries available
+		# empty list of battery sub directories; implies no batteries available
 		self.battery_dir_entries = []
 
 		try:
@@ -217,8 +220,10 @@ class AcpiLinux:
 					self.battery_dir_entries.append(i)
 		except OSError:
 			# the battery module is not correctly loaded, or is broken.
-			# currently self.battery_dir_entries has no batteries.		
-			return
+			# currently self.battery_dir_entries has no batteries or only
+			# the batteries which we could stat
+			# because the appended dirs should be okay we do not return here
+			pass
 		
 		self.ac_line_state = OFFLINE
 
@@ -230,13 +235,21 @@ class AcpiLinux:
 				while len(line) != 0:
 					if line.find("last full capacity:") == 0:
 						cap = line.split(":")[1].strip()
-						self.design_capacity[i] = int(cap.split("mWh")[0].strip())					
+						try:
+							self.design_capacity[i] = int(cap.split("mWh")[0].strip())
+						except ValueError:
+							#no value --> conversion to int failed
+							self.design_capacity[i] = 0
+							
 					line = info_file.readline()
 				info_file.close()
 		except IOError:
 			# the battery module is not correctly loaded... the file info should exist.
+			# wipe out all lists --> no battery infos
 			self.battery_dir_entries = []
 			self.design_capacity = {}
+			self.life_capacity = {}
+			self.present_rate = {}
 
 
 	def update_batteries(self):
@@ -250,13 +263,21 @@ class AcpiLinux:
 				while len(line) != 0:
 					if line.find("remaining capacity") == 0:
 						cap = line.split(":")[1].strip()
-						self.life_capacity[i] = int(cap.split("mWh")[0].strip())
-						
-					#a little bit tricky... if loading of ac driver fails, we cant use info
-					#from /proc/ac_*/...
-					#if information in /proc/acpi/battery/*/state is wrong we had to
-					#track the capacity history.
-					#I asume that all battery state files get the same state.
+						try:
+							self.life_capacity[i] = int(cap.split("mWh")[0].strip())
+						except ValueError:
+							self.life_capacity[i] = 0
+
+# it's possible that in battery/*/info the charging state is unknown
+# --> then we must check ac_state...
+# iterating over all batteries this way is not smart. better implementation needed
+# better are funcs for capacity, acstate and prrate
+
+					# a little bit tricky... if loading of ac driver fails, we cant use info
+					# from /proc/ac_*/...
+					# if information in /proc/acpi/battery/*/state is wrong we had to
+					# track the capacity history.
+					# I asume that all battery state files get the same state.
 					if line.find("charging state") == 0:
 						state = line.split(":")[1].strip()
 						if state == "discharging":
@@ -270,73 +291,101 @@ class AcpiLinux:
 					# estimate life time 
 
 					if line.find("present rate:") == 0:
-						pr_rate = float(line.split(":")[1].strip().split("mW")[0].strip())
+						try:
+							pr_rate = float(line.split(":")[1].strip().split("mW")[0].strip())
+						except ValueError:
+							pr_rate = 0
+							
 						self.present_rate[i] = pr_rate
 
 					line = state_file.readline()
 				state_file.close()
 		except IOError:
-			#raise AcpiError, ERR_CONFIGURATION_CHANGED 
+			raise AcpiError, ERR_CONFIGURATION_CHANGED 
+
 			# maybe we should restart init_batteries instead of generating an error ?
 			# the user may have unplugged the battery.
-			init_batteries()
-
+			#init_batteries()
+			# I prefer raising an exception because we would run into a recursion of
+			# member funcs what is not a good idea.
+			# the case that this error occurs should be very rare
+			
 
 	def init_temperatures(self):
 		"""Initializes temperature stuff"""
 
+		self.proc_thermal_dir = self.proc_acpi_dir + "/thermal_zone"
+
+		# empty list implies no thermal feature supported
 		self.temperatures = {}
 
+		# empty list of thermal sub directories; implies no thermal infos available
+		self.thermal_dir_entries = []
+
 		try:
-			# Read /proc/acpi/thermal_zone/*
-			for i in  os.listdir("/proc/acpi/thermal_zone"):
-				self.temperatures[i] = "0"
+			thermal_dir_entries = os.listdir(self.proc_thermal_dir)
 		except OSError:
-			self.temperatures = {}   #reset list --> should we throw an exception
-			return
+			return   #nothing more to do
+
+		try:
+			for i in thermal_dir_entries:
+				mode = os.stat(self.proc_thermal_dir + "/" + i)[stat.ST_MODE]
+				if stat.S_ISDIR(mode):
+					self.thermal_dir_entries.append(i)
+		except OSError:
+			# the thermal module is not correctly loaded, or is broken.
+			# because the appended dirs should be okay we do not return here
+			pass
 
 
 	def update_temperatures(self):
 		"""Read current temperatures"""
-		
-					
-		# Update processor temperature
-#so natuerlich quatsch: da muss ja dann der dateiname drinnenstehen!!!
 
 		try:
-			for i in  self.temperatures:
-				#here we should use try/except
-				file = open("/proc/acpi/thermal_zone/"+i+"/temperature")
+			for i in self.thermal_dir_entries:
+				file = open(self.proc_thermal_dir + "/" + i + "/temperature")
 				line = file.readline()
 				while len(line) != 0:
 					if line.find("temperature") == 0:
 						self.temperatures[i] = line.split(":")[1].strip()
 					line = file.readline()
 				file.close()
-		except:
+		except IOError:
 			raise AcpiError,ERR_CONFIGURATION_CHANGED
+
 			
 	def init_fans(self):
 		"""Initialize fans"""
-		
+
+		self.proc_fan_dir = self.proc_acpi_dir + "/fan"
+
 		self.fans = {}
 
+		# empty list of fan sub directories; implies no fan infos available
+		self.fan_dir_entries = []
+
 		try:
-			# Read /proc/acpi/fan/*
-			for i in os.listdir("/proc/acpi/fan"):
-				self.fans[i] = "off"
+			fan_dir_entries = os.listdir(self.proc_fan_dir)
 		except OSError:
-			#no fan support
-			self.fans = {}   #reset list --> should we throw an exception
-			return
+			return   #nothing more to do
+
+		try:
+			for i in fan_dir_entries:
+				mode = os.stat(self.proc_fan_dir + "/" + i)[stat.ST_MODE]
+				if stat.S_ISDIR(mode):
+					self.fan_dir_entries.append(i)
+		except OSError:
+			# the fan module is not correctly loaded, or is broken.
+			# because the appended dirs should be okay we do not return here
+			pass
 		
 
 	def update_fans(self):
 		"""Read current state of fans"""
 		
 		try:
-			for i in os.listdir("/proc/acpi/fan"):
-				file = open("/proc/acpi/fan/"+i+"/state")
+			for i in self.fan_dir_entries:
+				file = open(self.proc_fan_dir + "/" + i + "/state")
 				line = file.readline()
                 	        while len(line) != 0:
                 	                if line.find("status") == 0:
@@ -346,65 +395,83 @@ class AcpiLinux:
 							self.fans[i] = FAN_OFF
 					line = file.readline()
 				file.close()
-		except:
+		except IOError:
 			raise AcpiError,ERR_CONFIGURATION_CHANGED
+
 
 	def init_processors(self):
 		"""Initialize processors"""
 
-		#at the moment only the first processor is supported?
+		self.proc_processor_dir = self.proc_acpi_dir + "/processor"
 
+# TODO: adapt it for multiple CPUs --> we need a matrix instead of a vector!!!
 		self.perf_states = {}   #empty list implies no processor support
-		
-		try:
-			# Read processor info
-			self.processor = os.listdir("/proc/acpi/processor")[0]
-		except OSError:
-			#no prcessor support
-			return
+
+		# empty list of processor sub directories; implies no processor infos available
+		self.processor_dir_entries = []
 
 		try:
-			f = open("/proc/acpi/processor/"+self.processor+"/performance")
+			processor_dir_entries = os.listdir(self.proc_processor_dir)
+		except OSError:
+			return   #nothing more to do
+
+		try:
+			for i in processor_dir_entries:
+				mode = os.stat(self.proc_processor_dir + "/" + i)[stat.ST_MODE]
+				if stat.S_ISDIR(mode):
+					self.processor_dir_entries.append(i)
+		except OSError:
+			# the processor module is not correctly loaded, or is broken.
+			# because the appended dirs should be okay we do not return here
+			pass
+
+		try:
+			for i in self.processor_dir_entries:
+				file = open(self.proc_processor_dir + "/" + i + "/performance")
+				line = file.readline()
+				while(len(line)!=0):
+					if line.find("MHz") > -1:
+						state = line.split(":")[0].strip().split("P")[-1]
+						freq = line.split(":")[1].split(",")[0].strip()
+						self.perf_states[freq] = state
+					line = file.readline()
+				file.close()
 		except IOError:
-			self.perf_states = {}   #reset list --> should we throw an exception
+			self.processor_dir_entries = []
+			self.perf_states = {}   #reset list --> should we throw an exception? No!
 			return
 			
-		l = f.readline()
-		while(len(l)!=0):
-			if l.find("MHz") > -1:
-				state = l.split(":")[0].strip().split("P")[-1]
-				freq = l.split(":")[1].split(",")[0].strip()
-				self.perf_states[freq] = state
-			l = f.readline()
-
 
 	def update_processors(self):
 		"""Read current state of processors"""
 
 		try:
-			pr = os.listdir("/proc/acpi/processor")[0]
-			f = open("/proc/acpi/processor/"+pr+"/performance","r")
-			l = f.readline()
-			while(len(l)!=0):
-				if l.find("*") > -1:
-					self.freq = l.split(":")[1].strip().split(",")[0]
-				l = f.readline()
-			f.close()
-		except:
+			for i in self.processor_dir_entries:
+				file = open(self.proc_processor_dir + "/" + i + "/performance")
+				line = file.readline()
+
+				while(len(line)!=0):
+					if line.find("*") > -1:
+						self.freq = line.split(":")[1].strip().split(",")[0]
+					line = f.readline()
+				file.close()
+		except IOError:
 			raise AcpiError,ERR_CONFIGURATION_CHANGED
+
 
 	def percent(self):
 		"""Returns percentage capacity of all batteries"""
-
-		if self.nb_of_batteries() == 0:
-			return 0
 
 		life_capacity = 0
 		design_capacity = 0
 		for i,c in self.life_capacity.items():
 			life_capacity = life_capacity + c
 			design_capacity = design_capacity + self.design_capacity[i]
+
+		if design_capacity == 0:
+			return 0
 		
+		# should we use try catch instead of the check above?
 		return (life_capacity * 100) / design_capacity
 
 
@@ -420,7 +487,7 @@ class AcpiLinux:
 		#returns the number of batteries
 		#if it returns 0, maybe ACPI is not available or 
 		#battery driver is not load
-		return len(self.life_capacity)
+		return len(self.battery_dir_entries)
 
 		
 	def charging_state(self):
@@ -428,6 +495,11 @@ class AcpiLinux:
 
 
 	def estimated_lifetime(self):
+
+		# what should we return if state==charging?
+		# it's not clean to return a time in one case and any
+		# English string in another case.
+		# The user can check for ac-state before call this func
 		time = 0
 		for batt,life_capacity in self.life_capacity.items():
 			if self.present_rate[batt] == 0:
@@ -436,22 +508,24 @@ class AcpiLinux:
 		return str(time)
 
 
-	def temperature(self):
-		return self.temperatures
+	# we need funcs like max_temperature and average_temperature
+	def temperature(self, idx):
+		return self.temperatures[idx]
 
 
-	def fan_state(self):
-		return self.fans
+	def fan_state(self, idx):
+		return self.fans[idx]
 
 
-	def performance_states(self):
-		return self.perf_states.keys()
+	def performance_states(self, idx):
+		return self.perf_states[idx].keys()
 
 
-	def frequency(self):
-		return self.freq
+	def frequency(self, idx):
+		return self.freq[idx]
 
 
+# TODO: adapt it for multiple CPUs
 	def set_frequency(self,f):
 	#I think we should throw exceptions if someone goes wrong here
 	
