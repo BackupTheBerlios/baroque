@@ -18,14 +18,6 @@ class AcpiLinuxProc(DefaultClass):
 		# Call super-class. Will run inits on everything, and update()
 		DefaultClass.__init__(self)
 
-	def update(self):
-		"""Read current states of supported acpi components"""
-		# XXX: Change this to check against self.abilities for what to update.
-
-		self.update_batteries()
-		self.update_fans()
-		self.update_temperatures()
-
         # battery related functions
 	def init_batteries(self):
 		"""Checks for and initializes the batteries"""
@@ -204,7 +196,6 @@ class AcpiLinuxProc(DefaultClass):
 		except IOError:
 			raise PowerError,ERR_CONFIGURATION_CHANGED
 
-			
 	def init_fans(self):
 		"""Initialize fans"""
 
@@ -229,7 +220,6 @@ class AcpiLinuxProc(DefaultClass):
 			# the fan module is not correctly loaded, or is broken.
 			# because the appended dirs should be okay we do not return here
 			pass
-		
 
 	def update_fans(self):
 		"""Read current state of fans"""

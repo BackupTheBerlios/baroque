@@ -7,12 +7,12 @@ myAcpi = Power()
 myAcpi.update()
 
 
-print "number of fans : " + str(myAcpi.nb_of_fans())
 
 try:
+	print "number of fans : " + str(myAcpi.nb_of_fans())
 	for I in range(myAcpi.nb_of_fans()):
 		print 'fan ' + str(I) + ': ' + str(myAcpi.fan_state(0))
-except IndexError:
+except:
 	print "fan : None detected."
 
 print "ac-adapter : " + str(myAcpi.charging_state())

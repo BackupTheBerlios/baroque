@@ -1,4 +1,4 @@
-from sys import stdout
+from sys import stderr
 
 # ENUMS ####################################
 # should be imported by every subclass.
@@ -58,8 +58,16 @@ class DefaultClass(object):
 
 	def update(self):
 		# Updates all entries in 'self.abilities.' Raises appropriate exceptions if anything interesting has changed.
-		print >> stdout, 'TODO: Make this parse self.abilities and call updates itself.'
-		raise NotImplementedError
+		print self.abilities
+		for ability in self.abilities:
+			if ability == 'battery':
+				self.update_batteries()
+			elif ability == 'fan':
+				self.update_fans()
+			elif ability == 'processor':
+				self.update_processors()
+			elif ability == 'temperture':
+				self.update_temperture()
 
 	def get_has_ability(self, ability):
 		"""Returns if we have ability 'ability' in class-global 'self.abilities' list."""
@@ -67,11 +75,11 @@ class DefaultClass(object):
 
 	def delete_ability(self, ability):
 		"""Deletes ability ability from 'self.abilities.' Returns True if we had it in the class-global list."""
-		temp = get_index_of_ability(ability)
+		temp = self.get_index_of_ability(ability)
 		if temp:
 			# XXX: Here for debugging.
-			print >>sys.stderr, 'WARNING: removing ability %s.'%self.abilities[temp]
-			del self.abilities[x]
+			print >>stderr, 'WARNING: removing ability %s.'%self.abilities[temp]
+			del self.abilities[temp]
 			return True
 		# XXX: Here for debugging.
 		print >>stderr, 'WARNING: Attempted to remove ability %s, but it was not in our global abilities.'%ability
