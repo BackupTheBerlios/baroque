@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-## $Id: AppletRun,v 1.7 2002/11/15 23:35:28 riemer Exp $
+## $Id: AppletRun,v 1.8 2002/11/15 23:49:07 riemer Exp $
 ##
 ## Copyright (C) 2002 Tilo Riemer <riemer@lincvs.org>
 ## All rights reserved. 
@@ -81,7 +81,8 @@ def check_capacity(cap):
 	if alert_state == 0:
 		if (cap_val < cur_warn_level) and (ac_line_state == OFFLINE):
 			alert_state = 1
-			rox.alert('The capacity of battery is less than ' + cap)
+			msg = 'The capacity of battery is less than ' + str(cur_warn_level) + "%"
+			rox.alert(msg)
 			alert_state = 2
 			cur_warn_level = cur_warn_level * 2 / 3	 #decrease warn level
 	elif alert_state == 2:
