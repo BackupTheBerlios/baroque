@@ -1,9 +1,10 @@
 ##############################################################################
 ##
-## $Id: acpi.py,v 1.23 2003/12/15 20:04:09 riemer Exp $
+## $Id: acpi.py,v 1.24 2003/12/15 20:10:10 riemer Exp $
 ##
-## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>
-##                     and Luc Sorgue  <luc.sorgue@laposte.net>
+## Copyright (C) 2002-2003 Tilo Riemer <riemer@lincvs.org>,
+##                         Luc Sorgue  <luc.sorgue@laposte.net> and
+##                         Rds <rds@rdsarts.com>
 ## All rights reserved. 
 ##
 ## Redistribution and use in source and binary forms, with or without
