@@ -1,0 +1,16 @@
+INSTALL
+=======
+
+
+Linux 2.4:
+
+The Linux implementation reads informations from /proc/acpi/battery.
+Therefore a low level modul is not needed. Copy the file
+acpi.py from the acpi.py directory into your Python 
+directory/site-packages (in most cases you must be root for 
+that). 
+Be sure that the ACPI battery driver is loaded (you will have a
+/proc/acpi/battery directory)
+That's all.
+
+This version is tested with SuSE 8.1 and Linux 2.4.19.

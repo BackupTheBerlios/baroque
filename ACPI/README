@@ -1,0 +1,34 @@
+Introduction
+============
+
+The goal of acpi.py is providing of an uniform and platform
+independent interface to ACPI. At the moment it implements only
+battery relevant functions. The interface is not stable yet.
+
+Because I don't have dozens of laptops and operating systems
+I need help! It would be great to have a Python modul which
+covers ACPI more or less completely for many platforms one day.
+
+
+Usage of acpi.py
+===============
+
+Usage is simple. Do something like the following:
+
+import acpi
+battery = acpi.Acpi()
+
+...
+
+battery.update()
+print battery.percent()
+print battery.capacity()
+print battery.nb_of_batteries()
+print battery.charging_state()
+
+
+
+Note that you have to call update() if you want get the current
+state of battery. Note furthermore that acpi raises exceptions in 
+some cases. Please take a look into the short and well readable
+source file acpi.py.
